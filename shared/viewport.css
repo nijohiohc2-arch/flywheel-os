@@ -1,0 +1,107 @@
+/* Flywheel OS — desktop/mobile viewport toggle (real page, not iframe) */
+
+.fw-viewport-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10000;
+  display: inline-flex;
+  background: #121820;
+  border: 1px solid #2a3544;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+}
+
+.fw-viewport-toggle button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #8b9aab;
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.78rem;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+
+.fw-viewport-toggle button:hover {
+  color: #f0f4f8;
+}
+
+.fw-viewport-toggle button.active {
+  background: rgba(0, 229, 160, 0.2);
+  color: #00e5a0;
+}
+
+/* Real-phone: hide toggle; keep natural mobile CSS */
+@media (max-width: 700px) {
+  .fw-viewport-toggle {
+    display: none !important;
+  }
+}
+
+/* —— force-mobile: constrain THIS page (not an iframe) —— */
+@media (min-width: 701px) {
+  html.force-mobile {
+    background: #05070a !important;
+  }
+
+  html.force-mobile body {
+    width: 390px !important;
+    max-width: 390px !important;
+    margin: 20px auto !important;
+    min-height: calc(100vh - 40px) !important;
+    height: calc(100vh - 40px) !important;
+    border-radius: 32px;
+    border: 3px solid #4a5568;
+    box-shadow:
+      0 0 0 2px #1a222d,
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 0 0 12px rgba(0, 0, 0, 0.25),
+      0 28px 64px rgba(0, 0, 0, 0.55);
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    position: relative;
+    /* keep page bg inside the phone column */
+  }
+
+  /* subtle notch / speaker */
+  html.force-mobile body::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 72px;
+    height: 7px;
+    border-radius: 6px;
+    background: #2a3544;
+    z-index: 9999;
+    pointer-events: none;
+  }
+
+
+  /* dim outside phone via html bg; body stays the column */
+  html.force-mobile .app {
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: calc(100% - 12px);
+    max-height: none !important;
+  }
+
+  html.force-mobile .wrap {
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* keep toggle outside the phone chrome (fixed to viewport) */
+  html.force-mobile .fw-viewport-toggle {
+    top: 12px;
+    right: 12px;
+  }
+}
