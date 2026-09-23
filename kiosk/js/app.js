@@ -59,6 +59,52 @@
     return !!(s.checkIns && s.checkIns[bookingId]);
   }
 
+
+  const VIRTUAL_FELLOWS = ["민수", "서연", "지훈", "유진", "하늘", "도윤"];
+
+  function fellowMask(name) {
+    if (!name) return "크*";
+    const s = String(name).trim();
+    if (s.length <= 1) return s + "*";
+    return s[0] + "*";
+  }
+
+  function buildFellowCrew(excludeId, countWanted) {
+    const s = FlywheelStore.load();
+    const fellows = [];
+    const ids = Object.keys(s.checkIns || {});
+    ids.forEach((id) => {
+      if (id === excludeId) return;
+      const b = (s.bookings || []).find((x) => x.id === id);
+      fellows.push({ name: b ? b.name : "크루", real: true });
+    });
+    let i = 0;
+    while (fellows.length < countWanted && i < VIRTUAL_FELLOWS.length) {
+      const n = VIRTUAL_FELLOWS[i++];
+      if (fellows.some((f) => f.name === n)) continue;
+      fellows.push({ name: n, real: false });
+    }
+    return fellows.slice(0, countWanted);
+  }
+
+  function renderFellowChips(excludeId) {
+    const wrap = document.getElementById("crew-fellows");
+    if (!wrap) return;
+    wrap.innerHTML = "";
+    const fellows = buildFellowCrew(excludeId, 3);
+    fellows.forEach((f) => {
+      const chip = document.createElement("span");
+      chip.className = "crew-fellow-chip" + (f.real ? "" : " ghost");
+      const nick = fellowMask(f.name);
+      chip.innerHTML =
+        '<span class="av">' +
+        (f.name[0] || "?") +
+        "</span>" +
+        nick;
+      wrap.appendChild(chip);
+    });
+  }
+
   function recordCheckin(bookingId, phone, extras) {
     FlywheelStore.update((draft) => {
       draft.checkIns[bookingId] = {
@@ -249,16 +295,18 @@
     const name = maskName(currentBooking.name);
     const addonNote = currentBooking.hasShootingAddon ? " · 촬영 애드온" : "";
     $("#success-detail").textContent = `${name} 님, 좋은 운동 되세요${addonNote}`;
-    $("#checkin-count").textContent = `오늘 크루 ${count}명 입장 · 체크인 ${count}명`;
+    const displayCount = Math.max(count, 4);
     const crewFlash = document.getElementById("crew-flash");
     if (crewFlash) {
-      crewFlash.textContent = `오늘 크루 ${count}명 입장`;
+      crewFlash.textContent = `오늘 크루 ${displayCount}명 입장`;
       crewFlash.hidden = false;
       crewFlash.classList.add("show");
       setTimeout(() => {
         crewFlash.classList.remove("show");
-      }, 2800);
+      }, 3200);
     }
+    renderFellowChips(currentBooking.id);
+    $("#checkin-count").textContent = `오늘 크루 ${displayCount}명 입장 · 체크인 ${count}명`;
 
     const door = $("#door-anim");
     door.classList.remove("open");
@@ -281,6 +329,8 @@
     phoneDigits = "";
     updatePhoneUI();
     $("#door-anim").classList.remove("open");
+    const fellows = document.getElementById("crew-fellows");
+    if (fellows) fellows.innerHTML = "";
     showScreen("screen-phone");
   }
 

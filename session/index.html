@@ -8,6 +8,15 @@
 </head>
 <body>
   <div class="app" id="app">
+    <!-- Moment overlay (full-width brief banners) -->
+    <div class="moment-overlay" id="momentOverlay" hidden aria-live="assertive">
+      <div class="moment-banner" id="momentBanner">
+        <div class="moment-title" id="momentTitle"></div>
+        <div class="moment-sub" id="momentSub"></div>
+        <div class="moment-chips" id="momentChips"></div>
+      </div>
+    </div>
+
     <!-- Top bar -->
     <div id="opsBanner" class="ops-banner" hidden>
       관제에서 시작 신호 — 시작 누르기 (1초 후 자동 시작)
@@ -29,9 +38,18 @@
     <main class="display">
 
       <section class="ring-panel" aria-label="스테이션 링">
-        <div class="crew-strip" id="crewStrip" aria-label="크루 동반">
-          <span class="crew-strip-label">크루 동반</span>
-          <div class="crew-chips" id="crewChips"></div>
+        <!-- Large crew stage (not a tiny strip) -->
+        <div class="crew-stage" id="crewStage" aria-label="오늘 크루">
+          <div class="crew-stage-head">
+            <h2 class="crew-stage-title">오늘 크루 <span class="crew-count" id="crewCount">0</span></h2>
+            <div class="crew-energy" aria-label="크루 에너지">
+              <span class="crew-energy-label">크루 에너지</span>
+              <div class="crew-energy-track">
+                <div class="crew-energy-fill" id="crewEnergyFill" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="crew-avatars" id="crewAvatars"></div>
         </div>
         <svg id="stationRing" viewBox="0 0 400 400" role="img" aria-label="10개 스테이션 링">
           <circle class="ring-track" cx="200" cy="200" r="150" />
@@ -44,8 +62,10 @@
 
       <section class="countdown-panel">
         <div class="countdown" id="countdown">--:--</div>
-        <div class="crew-ticker" id="crewTicker" aria-live="polite">크루가 함께 돌고 있어요</div>
-        <div class="crew-move-flash" id="crewMoveFlash" hidden>크루 이동!</div>
+        <!-- Marquee billboard -->
+        <div class="crew-marquee" id="crewMarquee" aria-live="polite">
+          <div class="crew-marquee-inner" id="crewMarqueeInner">크루가 함께 돌고 있어요</div>
+        </div>
         <div class="station-row">
           <div class="station-card current">
             <span class="station-label">현재 스테이션</span>

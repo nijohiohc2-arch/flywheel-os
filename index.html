@@ -370,20 +370,87 @@
       text-align: center;
     }
 
-    /* Crew card */
+    /* Crew card — amplified preview */
     .crew-card {
       background: linear-gradient(135deg, rgba(0, 229, 160, 0.08), rgba(91, 157, 255, 0.06));
       border: 1px solid rgba(0, 229, 160, 0.35);
       border-radius: var(--radius);
-      padding: 1.15rem 1.25rem;
+      padding: 1.25rem 1.35rem;
       margin-bottom: 1.5rem;
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem 1.25rem;
+      align-items: start;
     }
     .crew-card .crew-icon { font-size: 1.75rem; line-height: 1; }
-    .crew-card h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem; color: var(--accent); }
-    .crew-card p { font-size: 0.88rem; color: var(--text-dim); line-height: 1.5; }
+    .crew-card h2 { font-size: 1.15rem; font-weight: 900; margin-bottom: 0.4rem; color: var(--accent); }
+    .crew-card > div > p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.55; }
+    .crew-mini {
+      grid-column: 1 / -1;
+      background: #0a0c10;
+      border: 1px solid #2a3344;
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 0.75rem;
+      min-height: 7.5rem;
+    }
+    .crew-mini-stage {
+      background: linear-gradient(180deg, rgba(61,255,154,0.08), rgba(91,157,255,0.05));
+      border: 1px solid rgba(61,255,154,0.25);
+      border-radius: 10px;
+      padding: 0.55rem 0.65rem;
+    }
+    .crew-mini-title {
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 0.45rem;
+    }
+    .crew-mini-title span {
+      display: inline-grid; place-items: center;
+      min-width: 1.1rem; height: 1.1rem; padding: 0 0.3rem;
+      margin-left: 0.2rem; border-radius: 999px;
+      background: var(--accent); color: #04110a; font-size: 0.65rem;
+    }
+    .crew-mini-avs {
+      display: flex; gap: 0.35rem; flex-wrap: wrap;
+    }
+    .crew-mini-av {
+      width: 1.85rem; height: 1.85rem; border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 0.65rem; font-weight: 900; color: #04110a;
+      background: linear-gradient(135deg, #5b9dff, #00e5a0);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .crew-mini-av.ghost { background: linear-gradient(135deg, #3a4a68, #5b9dff); color: #e8f0ff; border-style: dashed; }
+    .crew-mini-right {
+      display: flex; flex-direction: column; justify-content: center; gap: 0.4rem;
+    }
+    .crew-mini-count {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 900; color: var(--accent); letter-spacing: -0.03em; line-height: 1;
+    }
+    .crew-mini-marquee {
+      font-size: 0.78rem; font-weight: 800; color: var(--blue);
+      background: rgba(91,157,255,0.1); border: 1px solid rgba(91,157,255,0.3);
+      border-radius: 8px; padding: 0.35rem 0.55rem;
+    }
+    .crew-mini-energy {
+      height: 0.4rem; border-radius: 999px; background: #1c2433; overflow: hidden;
+      border: 1px solid #2a3344;
+    }
+    .crew-mini-energy > i {
+      display: block; height: 100%; width: 62%;
+      background: linear-gradient(90deg, #ffb020, #00e5a0);
+    }
+    .crew-mini-cap {
+      font-size: 0.68rem; color: var(--text-dim); font-weight: 600;
+    }
+    @media (max-width: 560px) {
+      .crew-mini { grid-template-columns: 1fr; }
+    }
 
     @media (max-width: 700px) {
       .preview-panel {
@@ -464,12 +531,30 @@
     <article class="crew-card" aria-label="크루 동반">
       <div class="crew-icon">👥</div>
       <div>
-        <h2>혼자 와도 크루처럼</h2>
+        <h2>혼자 와도 크루처럼 — 세션 UI 증폭</h2>
         <p>
-          세션 엔진에 <strong style="color:var(--text)">고스트 크루</strong>가 함께 돌아요.
-          입장한 멤버가 있으면 실명(마스킹)으로, 없으면 가상 크루가 스테이션을 채워
-          오프라인 짐 체크인 + 같이 훈련하는 느낌을 줍니다. 공유 타이머로 모두 같은 박자에 맞춰요.
+          짐 스크린에서도 한눈에: 큰 <strong style="color:var(--text)">오늘 크루</strong> 스테이지,
+          링 고스트, 마퀴 전광판, 순간 오버레이(시작·이동·랩·종료), 크루 에너지 바.
+          실체크인 있으면 마스킹 닉, 없으면 가상 크루 4–6명으로 절대 비지 않아요.
         </p>
+      </div>
+      <div class="crew-mini" aria-hidden="true">
+        <div class="crew-mini-stage">
+          <div class="crew-mini-title">오늘 크루 <span>5</span></div>
+          <div class="crew-mini-avs">
+            <span class="crew-mini-av">민</span>
+            <span class="crew-mini-av ghost">⚡</span>
+            <span class="crew-mini-av ghost">🔥</span>
+            <span class="crew-mini-av ghost">💪</span>
+            <span class="crew-mini-av ghost">✨</span>
+          </div>
+        </div>
+        <div class="crew-mini-right">
+          <div class="crew-mini-count">04:12</div>
+          <div class="crew-mini-marquee">크루 5명과 같은 타이머 · S3에서 준* 운동 중</div>
+          <div class="crew-mini-energy"><i></i></div>
+          <div class="crew-mini-cap">미리보기 · 세션 엔진 실제 화면은 더 큼</div>
+        </div>
       </div>
     </article>
 

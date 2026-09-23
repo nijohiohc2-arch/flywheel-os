@@ -566,3 +566,46 @@ html, body {
   40% { transform: scale(1.06); }
   100% { transform: scale(1); }
 }
+
+/* Amplified crew success */
+.crew-flash {
+  font-size: clamp(1.35rem, 4vw, 1.85rem) !important;
+  max-width: 28rem !important;
+  padding: 0.75rem 1.25rem !important;
+}
+.crew-fellows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 0.75rem auto 0.25rem;
+  max-width: 22rem;
+  min-height: 2rem;
+}
+.crew-fellow-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(91, 157, 255, 0.12);
+  border: 1px solid rgba(91, 157, 255, 0.45);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #e8f0ff;
+}
+.crew-fellow-chip .av {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #5b9dff, #00e5a0);
+  color: #04110a;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+.crew-fellow-chip.ghost {
+  border-style: dashed;
+  opacity: 0.9;
+}

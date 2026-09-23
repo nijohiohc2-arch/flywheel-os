@@ -1,6 +1,7 @@
 /**
  * 플라이휠 무인 서킷 — 세션 엔진 (GYM DISPLAY)
  * Work 40s + Move 20s · 시계방향 스테이션 · Web Speech (ko-KR)
+ * Amplified "crew together" feel
  */
 (function () {
   "use strict";
@@ -27,7 +28,9 @@
     done: "완료",
   };
 
-  /** @type {{ phase: string, remainingMs: number, lap: number, stationIndex: number, running: boolean, muted: boolean, timeline: object[], timelineIndex: number }} */
+  const AVATAR_MARKS = ["💪", "🔥", "⚡", "🏃", "✨", "🎯", "👊", "🌟"];
+
+  /** @type {object} */
   const state = {
     phase: "idle",
     remainingMs: 0,
@@ -42,8 +45,13 @@
     rafId: null,
     settingsLocked: false,
     crew: [],
+    crewFromStore: false,
     crewMoveCueCount: 0,
     lastCrewMoveAt: 0,
+    energy: 0,
+    energyMax: 100,
+    completedStations: 0,
+    lastLapShown: 0,
   };
 
   const els = {
@@ -71,10 +79,16 @@
     includeS10: document.getElementById("includeS10"),
     settingsPanel: document.getElementById("settingsPanel"),
     opsBanner: document.getElementById("opsBanner"),
-    crewChips: document.getElementById("crewChips"),
-    crewTicker: document.getElementById("crewTicker"),
-    crewMoveFlash: document.getElementById("crewMoveFlash"),
+    crewAvatars: document.getElementById("crewAvatars"),
+    crewCount: document.getElementById("crewCount"),
+    crewEnergyFill: document.getElementById("crewEnergyFill"),
+    crewMarqueeInner: document.getElementById("crewMarqueeInner"),
     crewGhosts: document.getElementById("crewGhosts"),
+    momentOverlay: document.getElementById("momentOverlay"),
+    momentBanner: document.getElementById("momentBanner"),
+    momentTitle: document.getElementById("momentTitle"),
+    momentSub: document.getElementById("momentSub"),
+    momentChips: document.getElementById("momentChips"),
   };
 
   function getSettings() {
@@ -178,7 +192,6 @@
     return timeline;
   }
 
-
   /* —— Crew together (ghost / real check-ins) —— */
   const VIRTUAL_CREW_POOL = [
     "민수", "서연", "지훈", "유진", "하늘", "도윤", "세린", "예준", "채원", "태호",
@@ -190,6 +203,11 @@
     const s = String(name).trim();
     if (s.length <= 1) return s + "*";
     return s[0] + "*";
+  }
+
+  function initialOf(name) {
+    const s = String(name || "?").trim();
+    return s[0] || "?";
   }
 
   function loadCrewRoster() {
@@ -213,8 +231,8 @@
       } catch (_) {}
     }
 
-    // Always keep 3–6 visible so solo never feels empty
-    const targetCount = Math.min(6, Math.max(3, members.length || 4));
+    // Always keep 4–6 visible so solo never feels empty
+    const targetCount = Math.min(6, Math.max(4, members.length || 5));
     if (members.length < targetCount) {
       const used = new Set(members.map((m) => m.name));
       let i = 0;
@@ -227,15 +245,16 @@
     }
     if (members.length > 6) members = members.slice(0, 6);
 
-    // Assign station offsets from "current" (user at index 0 relative)
     state.crew = members.map((m, i) => ({
       nick: maskNick(m.name),
+      initial: initialOf(m.name),
+      mark: AVATAR_MARKS[i % AVATAR_MARKS.length],
       real: m.real,
-      // offset 1..n so they sit on other stations
       offset: ((i + 1) % nStations) || nStations - 1,
       name: m.name,
     }));
     state.crewFromStore = fromStore;
+    if (els.crewCount) els.crewCount.textContent = String(state.crew.length);
     return state.crew;
   }
 
@@ -248,120 +267,187 @@
     return 0;
   }
 
-  function renderCrewStrip() {
-    if (!els.crewChips) return;
+  function renderCrewStage() {
+    if (!els.crewAvatars) return;
     if (!state.crew || state.crew.length === 0) loadCrewRoster();
     const stations = activeStations();
     const cur = currentStationIndexForCrew();
-    els.crewChips.innerHTML = "";
+    const n = stations.length || 1;
+
+    els.crewAvatars.innerHTML = "";
+    if (els.crewCount) els.crewCount.textContent = String(state.crew.length);
+
     state.crew.forEach((c) => {
-      const stIdx = (cur + c.offset) % stations.length;
+      const stIdx = (cur + c.offset) % n;
       const st = stations[stIdx];
-      const chip = document.createElement("span");
-      chip.className = "crew-chip" + (c.real ? "" : " ghost");
-      chip.innerHTML =
-        '<span class="st-tag">' +
-        (st ? st.id : "S?") +
-        "</span> " +
-        c.nick;
-      els.crewChips.appendChild(chip);
+      const isActivePhase =
+        state.phase === "work" && stIdx === cur;
+
+      const el = document.createElement("div");
+      el.className =
+        "crew-avatar" +
+        (c.real ? "" : " ghost") +
+        (isActivePhase ? " active-phase" : "");
+      el.innerHTML =
+        '<div class="crew-avatar-circle" title="' +
+        c.nick +
+        '">' +
+        (c.real ? c.initial : c.mark) +
+        "</div>" +
+        '<span class="crew-avatar-nick">' +
+        c.nick +
+        "</span>" +
+        '<span class="crew-avatar-station">' +
+        (st ? st.id + " " + st.name : "—") +
+        "</span>";
+      els.crewAvatars.appendChild(el);
     });
+
     renderCrewGhostsOnRing(cur, stations);
   }
 
   function renderCrewGhostsOnRing(curIdx, stations) {
     if (!els.crewGhosts) return;
-    els.crewGhosts.innerHTML = "";
     const n = stations.length;
-    if (!n) return;
+    if (!n) {
+      els.crewGhosts.innerHTML = "";
+      return;
+    }
     const cx = 200;
     const cy = 200;
     const r = 150;
-    state.crew.forEach((c) => {
+    const isMove = state.phase === "move";
+
+    // Reuse existing nodes for slide animation when possible
+    const existing = Array.from(els.crewGhosts.querySelectorAll(".crew-ghost-dot"));
+    state.crew.forEach((c, idx) => {
       const i = (curIdx + c.offset) % n;
       const angle = -Math.PI / 2 + (i / n) * Math.PI * 2;
-      // slightly outside the node
-      const rr = r + 34;
+      const rr = r + 36;
       const x = cx + rr * Math.cos(angle);
       const y = cy + rr * Math.sin(angle);
-      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      g.classList.add("crew-ghost-dot");
-      g.innerHTML =
-        '<circle cx="' +
-        x.toFixed(1) +
-        '" cy="' +
-        y.toFixed(1) +
-        '" r="11" />' +
-        '<text x="' +
-        x.toFixed(1) +
-        '" y="' +
-        (y + 3.5).toFixed(1) +
-        '" text-anchor="middle">' +
-        c.nick.replace("*", "") +
-        "</text>";
-      els.crewGhosts.appendChild(g);
+      const isActive = state.phase === "work" && i === curIdx;
+
+      let g = existing[idx];
+      if (!g) {
+        g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.classList.add("crew-ghost-dot");
+        g.innerHTML =
+          '<circle r="14" />' +
+          '<text text-anchor="middle" class="ghost-nick"></text>' +
+          '<title></title>';
+        els.crewGhosts.appendChild(g);
+      }
+      g.classList.toggle("active-phase", isActive);
+      g.classList.toggle("sliding", isMove);
+      const circ = g.querySelector("circle");
+      const txt = g.querySelector("text");
+      const title = g.querySelector("title");
+      if (circ) {
+        circ.setAttribute("cx", x.toFixed(1));
+        circ.setAttribute("cy", y.toFixed(1));
+      }
+      if (txt) {
+        txt.setAttribute("x", x.toFixed(1));
+        txt.setAttribute("y", (y + 4).toFixed(1));
+        txt.textContent = c.nick.replace("*", "");
+      }
+      if (title) title.textContent = c.nick + (stations[i] ? " · " + stations[i].id + " " + stations[i].name : "");
     });
+    // Remove extras
+    while (els.crewGhosts.children.length > state.crew.length) {
+      els.crewGhosts.removeChild(els.crewGhosts.lastChild);
+    }
   }
 
-  const TICKER_LINES_BASE = [
-    "크루가 함께 도는 중",
-    "이동! 다음 스테이션으로",
-    "혼자여도 짐 체크인 느낌",
-    "같은 타이머 · 같은 박자",
-  ];
+  /* —— Marquee billboard —— */
+  let marqueeIdx = 0;
+  let marqueeTimer = null;
 
-  let tickerIdx = 0;
-  let tickerTimer = null;
-
-  function buildTickerLines() {
+  function buildMarqueeLines() {
     const stations = activeStations();
     const cur = currentStationIndexForCrew();
-    const lines = [];
     const count = state.crew.length;
-    lines.push("크루 " + count + "명 함께 도는 중");
-    state.crew.slice(0, 3).forEach((c) => {
-      const stIdx = (cur + c.offset) % stations.length;
+    const lines = [];
+    lines.push("크루 " + count + "명과 같은 타이머");
+    if (state.phase === "move") {
+      lines.push("다 같이 이동!");
+    }
+    state.crew.slice(0, 4).forEach((c) => {
+      const stIdx = (cur + c.offset) % Math.max(stations.length, 1);
       const st = stations[stIdx];
-      if (st) lines.push(st.id + " " + st.name + " — " + c.nick);
+      if (st) lines.push(st.id + "에서 " + c.nick + " 운동 중");
     });
-    lines.push("이동! 다음 스테이션으로");
+    if (state.lap >= 1) {
+      lines.push("랩 " + state.lap + " — 크루 페이스 유지");
+    }
     if (state.phase === "work") lines.push("집중! 크루도 같이 운동 중");
-    if (state.phase === "move") lines.push("크루 이동 중…");
-    return lines.concat(TICKER_LINES_BASE);
+    if (state.phase === "warmup") lines.push("워밍업 · 크루와 몸 풀기");
+    if (state.phase === "cooldown") lines.push("쿨다운 · 오늘 같이 돈 크루");
+    if (state.phase === "idle") lines.push("혼자여도 짐 체크인 느낌");
+    lines.push("같은 타이머 · 같은 박자");
+    return lines;
   }
 
-  function rotateTicker() {
-    if (!els.crewTicker) return;
-    const lines = buildTickerLines();
-    els.crewTicker.classList.add("fade");
+  function rotateMarquee() {
+    if (!els.crewMarqueeInner) return;
+    const lines = buildMarqueeLines();
+    els.crewMarqueeInner.classList.add("fade");
+    els.crewMarqueeInner.classList.remove("enter");
     setTimeout(() => {
-      tickerIdx = (tickerIdx + 1) % lines.length;
-      els.crewTicker.textContent = lines[tickerIdx];
-      els.crewTicker.classList.remove("fade");
-    }, 220);
+      marqueeIdx = (marqueeIdx + 1) % lines.length;
+      els.crewMarqueeInner.textContent = lines[marqueeIdx];
+      els.crewMarqueeInner.classList.remove("fade");
+      els.crewMarqueeInner.classList.add("enter");
+    }, 260);
   }
 
-  function startTicker() {
-    if (tickerTimer) clearInterval(tickerTimer);
-    rotateTicker();
-    tickerTimer = setInterval(rotateTicker, 3200);
+  function startMarquee() {
+    if (marqueeTimer) clearInterval(marqueeTimer);
+    if (els.crewMarqueeInner) {
+      const lines = buildMarqueeLines();
+      els.crewMarqueeInner.textContent = lines[0];
+    }
+    marqueeTimer = setInterval(rotateMarquee, 3000);
   }
 
-  function flashCrewMove() {
-    // Text always OK; voice only occasional (and never if muted)
-    state.crewMoveCueCount = (state.crewMoveCueCount || 0) + 1;
-    state.lastCrewMoveAt = Date.now();
-    if (els.crewMoveFlash) {
-      els.crewMoveFlash.hidden = false;
-      clearTimeout(els.crewMoveFlash._t);
-      els.crewMoveFlash._t = setTimeout(() => {
-        els.crewMoveFlash.hidden = true;
-      }, 1400);
+  /* —— Moment overlays —— */
+  let momentTimer = null;
+
+  function showMoment(kind, title, sub, chips, durationMs) {
+    if (!els.momentOverlay) return;
+    clearTimeout(momentTimer);
+    els.momentOverlay.hidden = false;
+    els.momentOverlay.className = "moment-overlay kind-" + (kind || "start");
+    els.momentTitle.textContent = title || "";
+    els.momentSub.textContent = sub || "";
+    els.momentChips.innerHTML = "";
+    if (chips && chips.length) {
+      chips.forEach((c) => {
+        const span = document.createElement("span");
+        span.className = "moment-chip";
+        span.textContent = c;
+        els.momentChips.appendChild(span);
+      });
     }
-    // Voice ~every 2nd move so we don't spam / cancel station cue too often
-    if (!state.muted && state.crewMoveCueCount % 2 === 0) {
-      speak("크루 이동!");
+    const ms = durationMs || 2000;
+    momentTimer = setTimeout(() => {
+      els.momentOverlay.hidden = true;
+    }, ms);
+  }
+
+  function bumpEnergy(amount) {
+    state.energy = Math.min(state.energyMax, state.energy + (amount || 8));
+    if (els.crewEnergyFill) {
+      const pct = Math.round((state.energy / state.energyMax) * 100);
+      els.crewEnergyFill.style.width = pct + "%";
     }
+  }
+
+  function resetEnergy() {
+    state.energy = 0;
+    state.completedStations = 0;
+    if (els.crewEnergyFill) els.crewEnergyFill.style.width = "0%";
   }
 
   /* —— Station ring SVG —— */
@@ -374,7 +460,6 @@
     els.stationNodes.innerHTML = "";
 
     stations.forEach((st, i) => {
-      // Clockwise from top (-90°)
       const angle = -Math.PI / 2 + (i / n) * Math.PI * 2;
       const x = cx + r * Math.cos(angle);
       const y = cy + r * Math.sin(angle);
@@ -421,7 +506,7 @@
         node.classList.add("next");
       }
     });
-    renderCrewStrip();
+    renderCrewStage();
   }
 
   /* —— Speech —— */
@@ -574,8 +659,12 @@
       finishSession();
       return;
     }
+    const prev = state.timeline[state.timelineIndex];
     state.timelineIndex = index;
     const step = state.timeline[index];
+    const prevPhase = state.phase;
+    const prevLap = state.lap;
+
     state.phase = step.phase;
     state.remainingMs = step.durationMs;
     state.lap = step.lap;
@@ -584,7 +673,55 @@
     speak(step.speak);
     updateDisplay();
 
+    // Crew moments (overlays always show; mute only suppresses voice)
+    if (index === 0 || (prevPhase === "idle" && step.phase !== "idle")) {
+      showMoment(
+        "start",
+        "크루 세션 시작",
+        "크루 " + state.crew.length + "명과 같은 타이머",
+        state.crew.slice(0, 4).map((c) => c.nick),
+        2200
+      );
+      bumpEnergy(5);
+    }
+
+    if (step.phase === "move") {
+      showMoment("move", "크루 이동!", step.cue || "다음 스테이션으로", null, 1800);
+      state.crewMoveCueCount = (state.crewMoveCueCount || 0) + 1;
+      if (!state.muted && state.crewMoveCueCount % 2 === 0) {
+        // occasional extra voice — speak() already ran station cue; light touch
+      }
+      bumpEnergy(6);
+      state.completedStations++;
+    }
+
+    // Lap cheer only when advancing to a new lap (2+), not the first work step
+    if (
+      step.phase === "work" &&
+      step.lap >= 2 &&
+      step.lap !== prevLap &&
+      step.stationIndex === 0
+    ) {
+      showMoment(
+        "lap",
+        "랩 " + step.lap + " — 같이 가자",
+        "크루 페이스 유지",
+        null,
+        2000
+      );
+      bumpEnergy(12);
+    }
+
     if (step.phase === "done") {
+      state.energy = state.energyMax;
+      if (els.crewEnergyFill) els.crewEnergyFill.style.width = "100%";
+      showMoment(
+        "end",
+        "오늘 같이 돈 크루",
+        "수고하셨습니다 · 크루 " + state.crew.length + "명",
+        state.crew.map((c) => c.nick + (c.real ? "" : " · 고스트")),
+        2800
+      );
       state.running = false;
       stopLoop();
       updateButtons();
@@ -597,6 +734,15 @@
     state.remainingMs = 0;
     stopLoop();
     speak("세션이 끝났습니다. 수고하셨습니다!");
+    state.energy = state.energyMax;
+    if (els.crewEnergyFill) els.crewEnergyFill.style.width = "100%";
+    showMoment(
+      "end",
+      "오늘 같이 돈 크루",
+      "수고하셨습니다 · 크루 " + state.crew.length + "명",
+      state.crew.map((c) => c.nick),
+      2800
+    );
     updateDisplay();
   }
 
@@ -634,7 +780,6 @@
 
   function startSession() {
     if (state.phase !== "idle" && state.phase !== "done" && !state.running) {
-      // Resume
       state.running = true;
       startLoop();
       updateButtons();
@@ -643,7 +788,6 @@
     if (state.running) return;
 
     const cfg = getSettings();
-    // Sync inputs to clamped values
     els.workSec.value = cfg.workSec;
     els.moveSec.value = cfg.moveSec;
     els.laps.value = cfg.laps;
@@ -654,6 +798,8 @@
     state.timeline = buildTimeline(cfg);
     state.timelineIndex = -1;
     state.running = true;
+    state.lastLapShown = 0;
+    resetEnergy();
     loadCrewRoster();
     renderRing();
     enterStep(0);
@@ -677,7 +823,6 @@
       state.running = true;
       startLoop();
     } else if (state.phase !== "done" && !wasRunning) {
-      // Stay paused on next phase
       state.running = false;
       stopLoop();
       updateButtons();
@@ -694,6 +839,8 @@
     state.stationIndex = -1;
     state.timeline = [];
     state.timelineIndex = -1;
+    resetEnergy();
+    if (els.momentOverlay) els.momentOverlay.hidden = true;
     renderRing();
     updateDisplay();
     els.cueLine.textContent = "시작을 누르면 워밍업이 시작됩니다.";
@@ -717,7 +864,6 @@
     if (state.phase === "idle") renderRing();
   });
 
-  // Keyboard shortcuts for gym operator
   document.addEventListener("keydown", (e) => {
     if (e.target.matches("input, textarea, summary")) return;
     if (e.code === "Space") {
@@ -743,7 +889,6 @@
 
     if (cmd.type === "start") {
       if (state.running) {
-        // Already running — ack and ignore
         lastHandledCommandAt = cmd.at;
         FlywheelStore.ackSessionCommand();
         return;
@@ -781,13 +926,13 @@
   loadCrewRoster();
   renderRing();
   updateDisplay();
-  startTicker();
+  startMarquee();
   pollCommand();
   if (typeof FlywheelStore !== "undefined") {
     FlywheelStore.subscribe(() => {
       pollCommand();
       loadCrewRoster();
-      renderCrewStrip();
+      renderCrewStage();
     });
   }
   setInterval(pollCommand, 1500);
