@@ -294,6 +294,27 @@
     }
 
 
+  
+    /* force-mobile: desktop viewport still wide — must not rely on @media alone */
+    html.force-mobile .live-kpis,
+    html.force-mobile .flow,
+    html.force-mobile .panels,
+    html.force-mobile .crew-card,
+    html.force-mobile .crew-mini {
+      grid-template-columns: 1fr !important;
+    }
+    html.force-mobile .panel {
+      width: 100%;
+      min-width: 0;
+    }
+    html.force-mobile .kpi-val { font-size: 1.5rem !important; }
+    html.force-mobile h1 { font-size: 1.45rem !important; }
+    html.force-mobile .actions { flex-direction: column; }
+    html.force-mobile .actions .btn,
+    html.force-mobile .btn {
+      width: 100%;
+      min-height: 48px;
+    }
   </style>
 </head>
 <body>

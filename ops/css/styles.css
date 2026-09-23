@@ -32,6 +32,8 @@ body {
 }
 
 .app {
+  container-type: inline-size;
+  container-name: flywheel;
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -655,14 +657,107 @@ body {
 }
 
 
-/* Mobile + force-mobile page polish (ops) */
-@media (max-width: 700px) {
+/* ==== force-mobile / narrow column: match real phone layout ==== */
+/* Media queries use VIEWPORT width; force-mobile only shrinks body.
+   So we re-apply mobile layout via html.force-mobile + @container. */
+
+html.force-mobile .app .header {
+  grid-template-columns: 1fr !important;
+  text-align: left;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+}
+html.force-mobile .app .header-center { text-align: left; }
+html.force-mobile .app .header-links {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+html.force-mobile .app .header-links a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.85rem;
+}
+html.force-mobile .app .clock-meta { justify-content: flex-start; }
+html.force-mobile .app .live-clock { font-size: 1.35rem !important; }
+html.force-mobile .app .brand-text h1 { font-size: 1rem !important; }
+
+html.force-mobile .app .kpi-row {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 0.5rem;
+}
+html.force-mobile .app .kpi-card {
+  padding: 0.75rem 0.8rem;
+  min-width: 0;
+}
+html.force-mobile .app .kpi-label {
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html.force-mobile .app .kpi-value { font-size: 1.45rem !important; }
+
+html.force-mobile .app .main-grid {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: none !important;
+  gap: 0.75rem;
+}
+html.force-mobile .app .current-slot { grid-row: auto !important; }
+html.force-mobile .app .panel {
+  min-width: 0;
+  width: 100%;
+  padding: 0.85rem;
+}
+html.force-mobile .app .panel-head {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+html.force-mobile .app .panel-head h2 { font-size: 1rem; }
+html.force-mobile .app .booking-list,
+html.force-mobile .app .timeline {
+  max-height: 260px;
+  overflow-y: auto;
+}
+html.force-mobile .app .booking-row {
+  grid-template-columns: 1fr auto !important;
+  gap: 0.4rem 0.6rem;
+}
+html.force-mobile .app .btn-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.4rem !important;
+}
+html.force-mobile .app .btn-row .btn {
+  flex: 1 1 calc(50% - 0.4rem);
+  min-height: 48px;
+  min-width: 0;
+  font-size: 0.85rem;
+  padding: 0.55rem 0.5rem;
+}
+html.force-mobile .app .btn-row .btn.btn-accent {
+  flex: 1 1 100%;
+}
+html.force-mobile .app .legend {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+html.force-mobile .app .toast-stack {
+  left: 0.5rem;
+  right: 0.5rem;
+  max-width: none;
+}
+
+@container flywheel (max-width: 440px) {
+  .header { grid-template-columns: 1fr; }
+  .header-center { text-align: left; }
+  .header-links { justify-content: flex-start; flex-wrap: wrap; }
   .kpi-row { grid-template-columns: repeat(2, 1fr); }
   .main-grid { grid-template-columns: 1fr; }
   .current-slot { grid-row: auto; }
-  .header { grid-template-columns: 1fr; }
-  .header-links { flex-wrap: wrap; justify-content: flex-start; }
-  .booking-list, .timeline { max-height: 280px; overflow-y: auto; }
+  .live-clock { font-size: 1.35rem; }
   .btn { min-height: 44px; }
-  .toast-stack { left: 0.65rem; right: 0.65rem; max-width: none; }
 }
+

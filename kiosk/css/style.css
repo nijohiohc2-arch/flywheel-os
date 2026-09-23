@@ -32,6 +32,8 @@ html, body {
 }
 
 .app {
+  container-type: inline-size;
+  container-name: flywheel;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -628,3 +630,31 @@ html, body {
   .header { flex-wrap: wrap; gap: 0.4rem; }
   .admin-hint { display: none; }
 }
+
+
+html.force-mobile .keypad {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 0.5rem !important;
+  width: 100%;
+  max-width: 100%;
+}
+html.force-mobile .key {
+  min-height: 56px !important;
+  width: 100% !important;
+  font-size: 1.4rem !important;
+}
+html.force-mobile .phone-display,
+html.force-mobile .digits,
+html.force-mobile .phone-readout {
+  font-size: 1.45rem !important;
+  text-align: center;
+  word-break: break-all;
+}
+html.force-mobile .btn,
+html.force-mobile .primary-btn,
+html.force-mobile button.primary {
+  min-height: 52px !important;
+  width: 100%;
+}
+

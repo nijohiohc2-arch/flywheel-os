@@ -504,3 +504,58 @@
     flex-wrap: wrap;
   }
 }
+
+
+/* —— Explicit page grids (viewport media ≠ body width) —— */
+html.force-mobile .main-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: 0.75rem !important;
+}
+html.force-mobile .main-grid > .panel {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+html.force-mobile .kpi-row {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+html.force-mobile .header {
+  grid-template-columns: 1fr !important;
+}
+html.force-mobile .current-slot {
+  grid-row: auto !important;
+}
+
+/* Hub */
+html.force-mobile .live-kpis,
+html.force-mobile .flow,
+html.force-mobile .panels {
+  grid-template-columns: 1fr !important;
+  display: grid !important;
+}
+html.force-mobile .panel {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+/* Session display stack */
+html.force-mobile .display {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Kiosk keypad */
+html.force-mobile .keypad {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 0.45rem !important;
+}
+html.force-mobile .keypad button,
+html.force-mobile .key {
+  min-height: 56px !important;
+  aspect-ratio: 1.15 / 1;
+  font-size: 1.35rem !important;
+}
+

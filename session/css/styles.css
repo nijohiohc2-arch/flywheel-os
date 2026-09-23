@@ -29,6 +29,8 @@ html, body {
 }
 
 .app {
+  container-type: inline-size;
+  container-name: flywheel;
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 100vh;
@@ -816,3 +818,37 @@ html, body {
   .phase-badge { font-size: 0.95rem; padding: 0.35rem 0.85rem; }
   .cue-line, .crew-marquee-inner { text-align: center; }
 }
+
+
+html.force-mobile .app {
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  grid-template-rows: auto auto auto !important;
+}
+html.force-mobile body {
+  overflow: auto !important;
+}
+html.force-mobile .display {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
+}
+html.force-mobile .countdown {
+  font-size: 3.5rem !important;
+}
+html.force-mobile .control-btns {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 0.45rem !important;
+}
+html.force-mobile .control-btns .btn {
+  min-height: 48px !important;
+  width: 100%;
+}
+html.force-mobile .station-row {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
