@@ -27,10 +27,16 @@
 
     <!-- Main display -->
     <main class="display">
+
       <section class="ring-panel" aria-label="스테이션 링">
+        <div class="crew-strip" id="crewStrip" aria-label="크루 동반">
+          <span class="crew-strip-label">크루 동반</span>
+          <div class="crew-chips" id="crewChips"></div>
+        </div>
         <svg id="stationRing" viewBox="0 0 400 400" role="img" aria-label="10개 스테이션 링">
           <circle class="ring-track" cx="200" cy="200" r="150" />
           <g id="stationNodes"></g>
+          <g id="crewGhosts"></g>
           <text class="ring-center-label" x="200" y="195" text-anchor="middle">현재</text>
           <text class="ring-center-name" id="ringCenterName" x="200" y="230" text-anchor="middle">—</text>
         </svg>
@@ -38,6 +44,8 @@
 
       <section class="countdown-panel">
         <div class="countdown" id="countdown">--:--</div>
+        <div class="crew-ticker" id="crewTicker" aria-live="polite">크루가 함께 돌고 있어요</div>
+        <div class="crew-move-flash" id="crewMoveFlash" hidden>크루 이동!</div>
         <div class="station-row">
           <div class="station-card current">
             <span class="station-label">현재 스테이션</span>

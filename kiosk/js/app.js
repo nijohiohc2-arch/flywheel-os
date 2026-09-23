@@ -249,7 +249,16 @@
     const name = maskName(currentBooking.name);
     const addonNote = currentBooking.hasShootingAddon ? " · 촬영 애드온" : "";
     $("#success-detail").textContent = `${name} 님, 좋은 운동 되세요${addonNote}`;
-    $("#checkin-count").textContent = `오늘 체크인 ${count}명`;
+    $("#checkin-count").textContent = `오늘 크루 ${count}명 입장 · 체크인 ${count}명`;
+    const crewFlash = document.getElementById("crew-flash");
+    if (crewFlash) {
+      crewFlash.textContent = `오늘 크루 ${count}명 입장`;
+      crewFlash.hidden = false;
+      crewFlash.classList.add("show");
+      setTimeout(() => {
+        crewFlash.classList.remove("show");
+      }, 2800);
+    }
 
     const door = $("#door-anim");
     door.classList.remove("open");

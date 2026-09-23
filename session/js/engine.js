@@ -41,6 +41,9 @@
     lastTick: 0,
     rafId: null,
     settingsLocked: false,
+    crew: [],
+    crewMoveCueCount: 0,
+    lastCrewMoveAt: 0,
   };
 
   const els = {
@@ -68,6 +71,10 @@
     includeS10: document.getElementById("includeS10"),
     settingsPanel: document.getElementById("settingsPanel"),
     opsBanner: document.getElementById("opsBanner"),
+    crewChips: document.getElementById("crewChips"),
+    crewTicker: document.getElementById("crewTicker"),
+    crewMoveFlash: document.getElementById("crewMoveFlash"),
+    crewGhosts: document.getElementById("crewGhosts"),
   };
 
   function getSettings() {
@@ -171,6 +178,192 @@
     return timeline;
   }
 
+
+  /* —— Crew together (ghost / real check-ins) —— */
+  const VIRTUAL_CREW_POOL = [
+    "민수", "서연", "지훈", "유진", "하늘", "도윤", "세린", "예준", "채원", "태호",
+    "하준", "소율", "건우", "지아", "시우",
+  ];
+
+  function maskNick(name) {
+    if (!name) return "크*";
+    const s = String(name).trim();
+    if (s.length <= 1) return s + "*";
+    return s[0] + "*";
+  }
+
+  function loadCrewRoster() {
+    const stations = activeStations();
+    const nStations = Math.max(stations.length, 1);
+    let members = [];
+    let fromStore = false;
+
+    if (typeof FlywheelStore !== "undefined") {
+      try {
+        const s = FlywheelStore.load();
+        const checkIns = s.checkIns || {};
+        const ids = Object.keys(checkIns);
+        if (ids.length > 0) {
+          fromStore = true;
+          members = ids.map((id) => {
+            const b = (s.bookings || []).find((x) => x.id === id);
+            return { name: b ? b.name : "크루", real: true };
+          });
+        }
+      } catch (_) {}
+    }
+
+    // Always keep 3–6 visible so solo never feels empty
+    const targetCount = Math.min(6, Math.max(3, members.length || 4));
+    if (members.length < targetCount) {
+      const used = new Set(members.map((m) => m.name));
+      let i = 0;
+      while (members.length < targetCount && i < VIRTUAL_CREW_POOL.length) {
+        const n = VIRTUAL_CREW_POOL[i++];
+        if (used.has(n)) continue;
+        used.add(n);
+        members.push({ name: n, real: false });
+      }
+    }
+    if (members.length > 6) members = members.slice(0, 6);
+
+    // Assign station offsets from "current" (user at index 0 relative)
+    state.crew = members.map((m, i) => ({
+      nick: maskNick(m.name),
+      real: m.real,
+      // offset 1..n so they sit on other stations
+      offset: ((i + 1) % nStations) || nStations - 1,
+      name: m.name,
+    }));
+    state.crewFromStore = fromStore;
+    return state.crew;
+  }
+
+  function currentStationIndexForCrew() {
+    const step = state.timeline[state.timelineIndex];
+    if (!step) return 0;
+    if (step.phase === "work" || step.phase === "move") {
+      return Math.max(0, step.stationIndex);
+    }
+    return 0;
+  }
+
+  function renderCrewStrip() {
+    if (!els.crewChips) return;
+    if (!state.crew || state.crew.length === 0) loadCrewRoster();
+    const stations = activeStations();
+    const cur = currentStationIndexForCrew();
+    els.crewChips.innerHTML = "";
+    state.crew.forEach((c) => {
+      const stIdx = (cur + c.offset) % stations.length;
+      const st = stations[stIdx];
+      const chip = document.createElement("span");
+      chip.className = "crew-chip" + (c.real ? "" : " ghost");
+      chip.innerHTML =
+        '<span class="st-tag">' +
+        (st ? st.id : "S?") +
+        "</span> " +
+        c.nick;
+      els.crewChips.appendChild(chip);
+    });
+    renderCrewGhostsOnRing(cur, stations);
+  }
+
+  function renderCrewGhostsOnRing(curIdx, stations) {
+    if (!els.crewGhosts) return;
+    els.crewGhosts.innerHTML = "";
+    const n = stations.length;
+    if (!n) return;
+    const cx = 200;
+    const cy = 200;
+    const r = 150;
+    state.crew.forEach((c) => {
+      const i = (curIdx + c.offset) % n;
+      const angle = -Math.PI / 2 + (i / n) * Math.PI * 2;
+      // slightly outside the node
+      const rr = r + 34;
+      const x = cx + rr * Math.cos(angle);
+      const y = cy + rr * Math.sin(angle);
+      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.classList.add("crew-ghost-dot");
+      g.innerHTML =
+        '<circle cx="' +
+        x.toFixed(1) +
+        '" cy="' +
+        y.toFixed(1) +
+        '" r="11" />' +
+        '<text x="' +
+        x.toFixed(1) +
+        '" y="' +
+        (y + 3.5).toFixed(1) +
+        '" text-anchor="middle">' +
+        c.nick.replace("*", "") +
+        "</text>";
+      els.crewGhosts.appendChild(g);
+    });
+  }
+
+  const TICKER_LINES_BASE = [
+    "크루가 함께 도는 중",
+    "이동! 다음 스테이션으로",
+    "혼자여도 짐 체크인 느낌",
+    "같은 타이머 · 같은 박자",
+  ];
+
+  let tickerIdx = 0;
+  let tickerTimer = null;
+
+  function buildTickerLines() {
+    const stations = activeStations();
+    const cur = currentStationIndexForCrew();
+    const lines = [];
+    const count = state.crew.length;
+    lines.push("크루 " + count + "명 함께 도는 중");
+    state.crew.slice(0, 3).forEach((c) => {
+      const stIdx = (cur + c.offset) % stations.length;
+      const st = stations[stIdx];
+      if (st) lines.push(st.id + " " + st.name + " — " + c.nick);
+    });
+    lines.push("이동! 다음 스테이션으로");
+    if (state.phase === "work") lines.push("집중! 크루도 같이 운동 중");
+    if (state.phase === "move") lines.push("크루 이동 중…");
+    return lines.concat(TICKER_LINES_BASE);
+  }
+
+  function rotateTicker() {
+    if (!els.crewTicker) return;
+    const lines = buildTickerLines();
+    els.crewTicker.classList.add("fade");
+    setTimeout(() => {
+      tickerIdx = (tickerIdx + 1) % lines.length;
+      els.crewTicker.textContent = lines[tickerIdx];
+      els.crewTicker.classList.remove("fade");
+    }, 220);
+  }
+
+  function startTicker() {
+    if (tickerTimer) clearInterval(tickerTimer);
+    rotateTicker();
+    tickerTimer = setInterval(rotateTicker, 3200);
+  }
+
+  function flashCrewMove() {
+    // Text always OK; voice only occasional (and never if muted)
+    state.crewMoveCueCount = (state.crewMoveCueCount || 0) + 1;
+    state.lastCrewMoveAt = Date.now();
+    if (els.crewMoveFlash) {
+      els.crewMoveFlash.hidden = false;
+      clearTimeout(els.crewMoveFlash._t);
+      els.crewMoveFlash._t = setTimeout(() => {
+        els.crewMoveFlash.hidden = true;
+      }, 1400);
+    }
+    // Voice ~every 2nd move so we don't spam / cancel station cue too often
+    if (!state.muted && state.crewMoveCueCount % 2 === 0) {
+      speak("크루 이동!");
+    }
+  }
+
   /* —— Station ring SVG —— */
   function renderRing() {
     const stations = activeStations();
@@ -228,6 +421,7 @@
         node.classList.add("next");
       }
     });
+    renderCrewStrip();
   }
 
   /* —— Speech —— */
@@ -460,6 +654,7 @@
     state.timeline = buildTimeline(cfg);
     state.timelineIndex = -1;
     state.running = true;
+    loadCrewRoster();
     renderRing();
     enterStep(0);
     if (state.phase !== "done") startLoop();
@@ -583,11 +778,17 @@
   }
 
   // Init
+  loadCrewRoster();
   renderRing();
   updateDisplay();
+  startTicker();
   pollCommand();
   if (typeof FlywheelStore !== "undefined") {
-    FlywheelStore.subscribe(() => pollCommand());
+    FlywheelStore.subscribe(() => {
+      pollCommand();
+      loadCrewRoster();
+      renderCrewStrip();
+    });
   }
   setInterval(pollCommand, 1500);
 })();

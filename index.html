@@ -197,6 +197,213 @@
     @media (max-width: 900px) {
       .flow, .panels, .live-kpis { grid-template-columns: 1fr; }
     }
+
+    /* —— Device preview panel —— */
+    .preview-panel {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 9000;
+      width: min(440px, calc(100vw - 24px));
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      overflow: hidden;
+      font-size: 0.85rem;
+    }
+    .preview-panel.collapsed {
+      width: auto;
+      min-width: 0;
+    }
+    .preview-panel.collapsed .preview-body,
+    .preview-panel.collapsed .preview-toolbar-extra {
+      display: none;
+    }
+    .preview-head {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 0.65rem;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .preview-title {
+      font-weight: 800;
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-right: 0.25rem;
+      white-space: nowrap;
+    }
+    .seg {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .seg button {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.65rem;
+      cursor: pointer;
+    }
+    .seg button.active {
+      background: rgba(0, 229, 160, 0.2);
+      color: var(--accent);
+    }
+    .preview-head .spacer { flex: 1; min-width: 0.5rem; }
+    .preview-toggle-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.75rem;
+      width: 2rem;
+      height: 1.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .preview-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .preview-body {
+      padding: 0.65rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .preview-targets {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+    .preview-targets button {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-dim);
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 0.3rem 0.55rem;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .preview-targets button.active {
+      border-color: var(--accent-dim);
+      color: var(--accent);
+      background: rgba(0, 229, 160, 0.12);
+    }
+    .preview-frame-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #070a0f;
+      border-radius: 10px;
+      padding: 0.5rem;
+      min-height: 200px;
+    }
+    /* Desktop chrome */
+    .frame-desktop {
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 16 / 10;
+      height: auto;
+      max-height: 280px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #3a4660;
+      box-shadow: 0 0 0 4px #1a222d, 0 8px 24px rgba(0,0,0,0.4);
+      position: relative;
+      background: #000;
+    }
+    .frame-desktop iframe {
+      width: 1280px;
+      height: 800px;
+      border: 0;
+      transform-origin: 0 0;
+      pointer-events: auto;
+    }
+    /* Mobile phone chrome */
+    .frame-mobile {
+      width: 200px;
+      height: 390px;
+      border-radius: 28px;
+      border: 3px solid #4a5568;
+      box-shadow:
+        0 0 0 2px #1a222d,
+        inset 0 0 0 2px #0a0e14,
+        0 10px 28px rgba(0,0,0,0.5);
+      overflow: hidden;
+      position: relative;
+      background: #000;
+    }
+    .frame-mobile::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 56px;
+      height: 6px;
+      border-radius: 4px;
+      background: #2a3544;
+      z-index: 2;
+    }
+    .frame-mobile iframe {
+      width: 390px;
+      height: 844px;
+      border: 0;
+      transform-origin: 0 0;
+      margin-top: 18px;
+    }
+    .preview-hint {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    /* Crew card */
+    .crew-card {
+      background: linear-gradient(135deg, rgba(0, 229, 160, 0.08), rgba(91, 157, 255, 0.06));
+      border: 1px solid rgba(0, 229, 160, 0.35);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .crew-card .crew-icon { font-size: 1.75rem; line-height: 1; }
+    .crew-card h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem; color: var(--accent); }
+    .crew-card p { font-size: 0.88rem; color: var(--text-dim); line-height: 1.5; }
+
+    @media (max-width: 700px) {
+      .preview-panel {
+        top: auto;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        border-radius: 16px 16px 0 0;
+        max-height: 55vh;
+      }
+      .preview-panel.collapsed {
+        width: 100%;
+      }
+      .preview-frame-wrap { min-height: 160px; }
+      .frame-desktop { max-height: 180px; }
+      .frame-mobile { width: 140px; height: 270px; border-radius: 20px; }
+      .wrap { padding-bottom: 4.5rem; }
+    }
+
   </style>
 </head>
 <body>
@@ -253,6 +460,19 @@
       <button type="button" class="btn btn-ghost" id="btnReset">전체 초기화</button>
     </div>
 
+
+    <article class="crew-card" aria-label="크루 동반">
+      <div class="crew-icon">👥</div>
+      <div>
+        <h2>혼자 와도 크루처럼</h2>
+        <p>
+          세션 엔진에 <strong style="color:var(--text)">고스트 크루</strong>가 함께 돌아요.
+          입장한 멤버가 있으면 실명(마스킹)으로, 없으면 가상 크루가 스테이션을 채워
+          오프라인 짐 체크인 + 같이 훈련하는 느낌을 줍니다. 공유 타이머로 모두 같은 박자에 맞춰요.
+        </p>
+      </div>
+    </article>
+
     <section class="panels" aria-label="패널 열기">
       <article class="panel">
         <div class="panel-icon">📱</div>
@@ -283,6 +503,34 @@
     <footer>플라이휠 OS v0 · nijohiohc2-arch/flywheel-os · GitHub Pages</footer>
   </div>
 
+
+  <!-- Device preview (fixed) -->
+  <aside class="preview-panel" id="previewPanel" aria-label="기기 미리보기">
+    <div class="preview-head">
+      <span class="preview-title">미리보기</span>
+      <div class="seg" role="group" aria-label="기기 모드">
+        <button type="button" id="modeDesktop" class="active">데스크톱</button>
+        <button type="button" id="modeMobile">모바일</button>
+      </div>
+      <div class="spacer"></div>
+      <div class="seg preview-toolbar-extra" role="group" aria-label="대상 화면" id="previewTargetsHead" hidden></div>
+      <button type="button" class="preview-toggle-btn" id="previewCollapse" aria-label="미리보기 접기" title="접기">−</button>
+    </div>
+    <div class="preview-body" id="previewBody">
+      <div class="preview-targets" role="group" aria-label="대상 화면">
+        <button type="button" data-target="kiosk/" class="active">키오스크</button>
+        <button type="button" data-target="ops/">관제</button>
+        <button type="button" data-target="session/">세션</button>
+      </div>
+      <div class="preview-frame-wrap" id="previewFrameWrap">
+        <div class="frame-desktop" id="previewChrome">
+          <iframe id="previewIframe" title="기기 미리보기" src="kiosk/" loading="lazy"></iframe>
+        </div>
+      </div>
+      <p class="preview-hint">허브에서 키오스크 · 관제 · 세션을 바로 미리봅니다</p>
+    </div>
+  </aside>
+
   <script src="shared/store.js"></script>
   <script>
     (function () {
@@ -308,5 +556,79 @@
       setInterval(refresh, 2000);
     })();
   </script>
+
+  <script>
+    (function () {
+      const panel = document.getElementById("previewPanel");
+      const collapseBtn = document.getElementById("previewCollapse");
+      const modeDesktop = document.getElementById("modeDesktop");
+      const modeMobile = document.getElementById("modeMobile");
+      const chrome = document.getElementById("previewChrome");
+      const iframe = document.getElementById("previewIframe");
+      const wrap = document.getElementById("previewFrameWrap");
+      const targets = document.querySelectorAll(".preview-targets button");
+
+      let mode = "desktop"; // desktop | mobile
+      let target = "kiosk/";
+      let collapsed = false;
+
+      function scaleIframe() {
+        if (!iframe || !chrome) return;
+        const isMobile = mode === "mobile";
+        const iw = isMobile ? 390 : 1280;
+        const ih = isMobile ? 844 : 800;
+        // available size inside chrome
+        const rect = chrome.getBoundingClientRect();
+        let availW = rect.width;
+        let availH = rect.height;
+        if (isMobile) {
+          availH = Math.max(40, rect.height - 18);
+        }
+        const sx = availW / iw;
+        const sy = availH / ih;
+        const s = Math.min(sx, sy);
+        iframe.style.width = iw + "px";
+        iframe.style.height = ih + "px";
+        iframe.style.transform = "scale(" + s + ")";
+      }
+
+      function applyMode() {
+        chrome.className = mode === "mobile" ? "frame-mobile" : "frame-desktop";
+        modeDesktop.classList.toggle("active", mode === "desktop");
+        modeMobile.classList.toggle("active", mode === "mobile");
+        requestAnimationFrame(() => {
+          scaleIframe();
+          setTimeout(scaleIframe, 50);
+        });
+      }
+
+      function setTarget(t) {
+        target = t;
+        targets.forEach((b) => b.classList.toggle("active", b.dataset.target === t));
+        iframe.src = t;
+        setTimeout(scaleIframe, 100);
+      }
+
+      modeDesktop.addEventListener("click", () => { mode = "desktop"; applyMode(); });
+      modeMobile.addEventListener("click", () => { mode = "mobile"; applyMode(); });
+      targets.forEach((b) => b.addEventListener("click", () => setTarget(b.dataset.target)));
+
+      collapseBtn.addEventListener("click", () => {
+        collapsed = !collapsed;
+        panel.classList.toggle("collapsed", collapsed);
+        collapseBtn.textContent = collapsed ? "+" : "−";
+        collapseBtn.setAttribute("aria-label", collapsed ? "미리보기 펼치기" : "미리보기 접기");
+        collapseBtn.title = collapsed ? "펼치기" : "접기";
+        if (!collapsed) setTimeout(scaleIframe, 80);
+      });
+
+      window.addEventListener("resize", scaleIframe);
+      iframe.addEventListener("load", () => setTimeout(scaleIframe, 30));
+      applyMode();
+      // Default: 키오스크
+      setTarget("kiosk/");
+    })();
+  </script>
+
 </body>
 </html>

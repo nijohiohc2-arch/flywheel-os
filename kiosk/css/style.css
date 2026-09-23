@@ -539,3 +539,30 @@ html, body {
   .key { min-height: 58px; font-size: 1.5rem; }
   .admin-hint { display: none; }
 }
+
+.crew-flash {
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #00e5a0;
+  letter-spacing: 0.04em;
+  padding: 0.55rem 1rem;
+  border-radius: 12px;
+  background: rgba(0, 229, 160, 0.12);
+  border: 1px solid rgba(0, 229, 160, 0.4);
+  margin: 0.5rem auto 0;
+  max-width: 20rem;
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.35s, transform 0.35s;
+}
+.crew-flash.show {
+  opacity: 1;
+  transform: scale(1);
+  animation: crewPulse 0.8s ease-out;
+}
+@keyframes crewPulse {
+  0% { transform: scale(0.9); }
+  40% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
