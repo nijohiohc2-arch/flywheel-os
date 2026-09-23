@@ -3,301 +3,240 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0a0e14" />
-  <title>플라이휠 OS · 허브</title>
+  <meta name="theme-color" content="#07070a" />
+  <title>FLYWHEEL · CREW</title>
   <link rel="stylesheet" href="shared/viewport.css" />
   <style>
+    @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
     :root {
-      --bg: #070b12;
-      --bg-elev: #121820;
-      --bg-card: #1a222d;
-      --border: #2a3544;
-      --text: #f0f4f8;
-      --text-dim: #8b9aab;
-      --accent: #00e5a0;
-      --amber: #ffb020;
-      --red: #ff4d6a;
-      --blue: #5b9dff;
-      --violet: #b794f6;
-      --pink: #ff6bcb;
-      --radius: 16px;
+      --bg: #07070a;
+      --ink: #f5f5f0;
+      --mute: #9a9a92;
+      --lime: #c8ff00;
+      --pink: #ff2d6a;
+      --yellow: #ffe600;
+      --cyan: #2de2e6;
       --font: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); }
+    html, body { min-height: 100%; background: var(--bg); color: var(--ink); font-family: var(--font); }
     body {
       background:
-        radial-gradient(ellipse at 10% -5%, rgba(0, 229, 160, 0.18), transparent 42%),
-        radial-gradient(ellipse at 95% 5%, rgba(255, 107, 203, 0.12), transparent 38%),
-        radial-gradient(ellipse at 50% 100%, rgba(91, 157, 255, 0.1), transparent 45%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 3px),
+        radial-gradient(ellipse at 0% 0%, rgba(200,255,0,0.12), transparent 40%),
+        radial-gradient(ellipse at 100% 0%, rgba(255,45,106,0.14), transparent 42%),
         var(--bg);
     }
     .wrap {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 3rem 1.25rem 2.25rem;
-      padding-right: max(1.25rem, 7.5rem);
+      max-width: 960px; margin: 0 auto;
+      padding: 3rem 1.2rem 2.5rem;
+      padding-right: max(1.2rem, 7.5rem);
     }
-    .topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 0.75rem; margin-bottom: 0.85rem; flex-wrap: wrap;
-    }
-    .logo {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      font-weight: 900; letter-spacing: 0.08em; color: var(--accent); font-size: 0.82rem;
-    }
-    .logo-mark {
-      width: 1.9rem; height: 1.9rem; display: grid; place-items: center;
-      border-radius: 0.5rem;
-      background: linear-gradient(135deg, var(--accent), #1ec8ff);
-      color: #04110a; font-size: 0.72rem; font-weight: 900;
-      box-shadow: 0 0 20px rgba(0, 229, 160, 0.35);
-    }
-    .pulse-dot {
-      width: 0.55rem; height: 0.55rem; border-radius: 50%;
-      background: var(--accent); box-shadow: 0 0 0 0 rgba(0,229,160,0.6);
-      animation: live 1.6s ease-out infinite;
-    }
-    @keyframes live {
-      0% { box-shadow: 0 0 0 0 rgba(0,229,160,0.55); }
-      70% { box-shadow: 0 0 0 8px rgba(0,229,160,0); }
-      100% { box-shadow: 0 0 0 0 rgba(0,229,160,0); }
-    }
-    .live-label { font-size: 0.75rem; color: var(--text-dim); font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; }
 
-    /* KPI: compact 3 in one row — always */
+    /* Hero poster strip */
+    .hero {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;
+    }
+    .brand-block { display: flex; flex-direction: column; gap: 0.35rem; }
+    .sticker {
+      display: inline-flex; align-self: flex-start;
+      background: var(--lime); color: #07070a;
+      font-weight: 900; font-size: 0.7rem; letter-spacing: 0.12em;
+      padding: 0.28rem 0.55rem; transform: rotate(-2deg);
+      border: 2px solid #07070a; box-shadow: 3px 3px 0 #ff2d6a;
+    }
+    h1 {
+      font-size: clamp(2.1rem, 6vw, 3.4rem);
+      font-weight: 900; line-height: 0.95; letter-spacing: -0.04em;
+      text-transform: uppercase;
+    }
+    h1 span { color: var(--lime); }
+    .tag {
+      font-size: 0.85rem; font-weight: 800; color: var(--mute);
+      letter-spacing: 0.02em;
+    }
+    .live {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      background: var(--pink); color: #fff; font-weight: 900; font-size: 0.75rem;
+      letter-spacing: 0.14em; padding: 0.45rem 0.7rem;
+      border: 2px solid #fff; transform: rotate(2deg);
+      box-shadow: 3px 3px 0 var(--yellow);
+    }
+    .live i {
+      width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #fff;
+      display: block; animation: blink 1s steps(2) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0.25; } }
+
+    /* KPI 3-up compact */
     .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
-      margin-bottom: 0.85rem;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem;
+      margin-bottom: 0.9rem;
     }
     .kpi {
-      border-radius: 12px;
-      padding: 0.55rem 0.5rem 0.65rem;
-      text-align: center;
-      min-width: 0;
-      border: 1px solid transparent;
-      position: relative;
-      overflow: hidden;
+      border: 2.5px solid #fff; padding: 0.5rem 0.4rem 0.55rem;
+      text-align: center; min-width: 0;
+      box-shadow: 3px 3px 0 #000;
     }
-    .kpi::after {
-      content: ""; position: absolute; inset: auto -20% -40% -20%; height: 70%;
-      background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 65%);
-      pointer-events: none;
-    }
-    .kpi.book { background: linear-gradient(160deg, rgba(91,157,255,0.28), rgba(91,157,255,0.06)); border-color: rgba(91,157,255,0.45); }
-    .kpi.in { background: linear-gradient(160deg, rgba(0,229,160,0.28), rgba(0,229,160,0.06)); border-color: rgba(0,229,160,0.45); }
-    .kpi.ns { background: linear-gradient(160deg, rgba(255,77,106,0.28), rgba(255,77,106,0.06)); border-color: rgba(255,77,106,0.45); }
-    .kpi-label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em; opacity: 0.9; display: block; margin-bottom: 0.15rem; }
-    .kpi.book .kpi-label { color: #a8c9ff; }
-    .kpi.in .kpi-label { color: #7dffc4; }
-    .kpi.ns .kpi-label { color: #ff9aab; }
-    .kpi-val { font-size: 1.55rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
-    .kpi.book .kpi-val { color: #d6e6ff; }
-    .kpi.in .kpi-val { color: #b8ffe0; }
-    .kpi.ns .kpi-val { color: #ffd0d8; }
+    .kpi.book { background: var(--cyan); color: #041018; }
+    .kpi.in { background: var(--lime); color: #041018; }
+    .kpi.ns { background: var(--pink); color: #fff; }
+    .kpi-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.08em; display: block; }
+    .kpi-val { font-size: 1.6rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
 
-    .main-grid {
+    /* Main board */
+    .board {
       display: grid;
-      grid-template-columns: 1.35fr 1fr 1fr;
+      grid-template-columns: 1.4fr 1fr 1fr;
       grid-template-areas:
         "crew kiosk ops"
-        "crew session actions";
-      gap: 0.7rem;
+        "crew session run";
+      gap: 0.65rem;
     }
     .card {
-      border-radius: var(--radius);
-      padding: 1rem 0.95rem;
-      border: 1px solid var(--border);
-      min-width: 0;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
-      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      border: 2.5px solid #fff; color: inherit; text-decoration: none;
+      padding: 1rem 0.9rem; min-width: 0; min-height: 120px;
+      display: flex; flex-direction: column; gap: 0.4rem;
+      box-shadow: 4px 4px 0 #000;
+      transition: transform 0.12s, box-shadow 0.12s;
       position: relative;
-      overflow: hidden;
     }
-    a.card:hover { transform: translateY(-2px); }
-    .card-ico { font-size: 1.45rem; line-height: 1; }
-    .card-title { font-size: 1.05rem; font-weight: 900; letter-spacing: -0.02em; }
-    .card-sub { font-size: 0.78rem; color: rgba(255,255,255,0.72); line-height: 1.35; font-weight: 600; }
+    a.card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #000; }
+    .card-eyebrow {
+      font-size: 0.65rem; font-weight: 900; letter-spacing: 0.14em;
+      opacity: 0.8;
+    }
+    .card-title {
+      font-size: 1.35rem; font-weight: 900; letter-spacing: -0.03em; line-height: 1.05;
+    }
+    .card-sub { font-size: 0.78rem; font-weight: 700; opacity: 0.8; line-height: 1.3; }
     .card-go {
       margin-top: auto; align-self: flex-start;
-      font-size: 0.72rem; font-weight: 800;
-      padding: 0.35rem 0.65rem; border-radius: 999px;
-      background: rgba(0,0,0,0.25);
+      font-size: 0.72rem; font-weight: 900; letter-spacing: 0.06em;
+      background: #07070a; color: #fff; padding: 0.35rem 0.55rem;
     }
 
     .crew {
-      grid-area: crew;
-      background: linear-gradient(145deg, #00c98a 0%, #1ec8ff 55%, #7b6cff 100%);
-      border: none;
-      color: #041018;
-      box-shadow: 0 12px 40px rgba(0, 200, 140, 0.28), 0 0 0 1px rgba(255,255,255,0.12) inset;
-      min-height: 220px;
+      grid-area: crew; background: var(--lime); color: #07070a;
+      min-height: 240px;
+      background-image:
+        linear-gradient(135deg, transparent 40%, rgba(0,0,0,0.06) 40%, rgba(0,0,0,0.06) 42%, transparent 42%),
+        linear-gradient(160deg, #c8ff00, #9fef00);
     }
-    .crew .card-title { color: #041018; font-size: 1.25rem; }
-    .crew .card-sub { color: rgba(4,16,24,0.72); }
-    .crew-avatars {
-      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.25rem;
-    }
+    .crew .card-title { font-size: clamp(1.6rem, 3.5vw, 2.1rem); }
+    .crew-avatars { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.35rem 0; }
     .crew-av {
-      width: 2.35rem; height: 2.35rem; border-radius: 50%;
-      display: grid; place-items: center;
-      font-size: 0.72rem; font-weight: 900; color: #fff;
-      border: 2px solid rgba(255,255,255,0.55);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      animation: bob 2.4s ease-in-out infinite;
+      width: 2.5rem; height: 2.5rem; border-radius: 4px;
+      display: grid; place-items: center; font-weight: 900; font-size: 0.8rem;
+      border: 2px solid #07070a; color: #fff;
+      box-shadow: 2px 2px 0 #07070a;
     }
-    .crew-av:nth-child(2) { animation-delay: 0.2s; }
-    .crew-av:nth-child(3) { animation-delay: 0.4s; }
-    .crew-av:nth-child(4) { animation-delay: 0.6s; }
-    .crew-av:nth-child(5) { animation-delay: 0.8s; }
-    @keyframes bob {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-3px); }
-    }
-    .crew-stat {
-      margin-top: auto;
-      display: flex; align-items: baseline; gap: 0.35rem;
-      font-weight: 900;
-    }
-    .crew-stat strong { font-size: 1.75rem; line-height: 1; }
-    .crew-stat span { font-size: 0.8rem; opacity: 0.75; }
+    .crew-stat { margin-top: auto; display: flex; align-items: baseline; gap: 0.35rem; }
+    .crew-stat strong { font-size: 2.2rem; line-height: 0.9; }
+    .crew-stat span { font-size: 0.85rem; font-weight: 800; }
 
-    .kiosk { grid-area: kiosk; background: linear-gradient(160deg, rgba(91,157,255,0.35), rgba(91,157,255,0.08)); border-color: rgba(91,157,255,0.55); }
-    .kiosk .card-title { color: #cfe0ff; }
-    .kiosk:hover { box-shadow: 0 10px 28px rgba(91,157,255,0.25); }
-
-    .ops { grid-area: ops; background: linear-gradient(160deg, rgba(255,176,32,0.32), rgba(255,176,32,0.08)); border-color: rgba(255,176,32,0.55); }
-    .ops .card-title { color: #ffe2a8; }
-    .ops:hover { box-shadow: 0 10px 28px rgba(255,176,32,0.22); }
-
-    .session { grid-area: session; background: linear-gradient(160deg, rgba(183,148,246,0.35), rgba(183,148,246,0.08)); border-color: rgba(183,148,246,0.55); }
-    .session .card-title { color: #e4d4ff; }
-    .session:hover { box-shadow: 0 10px 28px rgba(183,148,246,0.25); }
-
-    .actions {
-      grid-area: actions;
-      background: linear-gradient(160deg, rgba(255,107,203,0.28), rgba(255,107,203,0.07));
-      border-color: rgba(255,107,203,0.5);
-      gap: 0.45rem;
-    }
-    .actions .card-title { color: #ffd0ee; }
-    .act-btns { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.15rem; }
+    .kiosk { grid-area: kiosk; background: var(--cyan); color: #041018; }
+    .ops { grid-area: ops; background: var(--yellow); color: #07070a; }
+    .session { grid-area: session; background: #7b5cff; color: #fff; }
+    .run { grid-area: run; background: var(--pink); color: #fff; gap: 0.45rem; }
+    .run .card-title { font-size: 1.2rem; }
+    .act-btns { display: flex; flex-direction: column; gap: 0.4rem; margin-top: auto; }
     .act-btns button {
-      appearance: none; border: none; cursor: pointer; font: inherit; font-weight: 800;
-      min-height: 44px; border-radius: 12px; padding: 0.55rem 0.75rem; font-size: 0.85rem;
+      appearance: none; border: 2px solid #07070a; cursor: pointer; font: inherit;
+      font-weight: 900; min-height: 46px; padding: 0.5rem 0.65rem; font-size: 0.85rem;
+      box-shadow: 2px 2px 0 #07070a;
     }
-    .act-btns .seed {
-      background: linear-gradient(180deg, #00e5a0, #00b87a); color: #04140e;
-      box-shadow: 0 6px 18px rgba(0,229,160,0.3);
-    }
-    .act-btns .reset {
-      background: rgba(0,0,0,0.28); color: #ffd0ee; border: 1px solid rgba(255,255,255,0.12);
-    }
+    .act-btns .seed { background: var(--lime); color: #07070a; }
+    .act-btns .reset { background: #07070a; color: #fff; border-color: #fff; box-shadow: 2px 2px 0 var(--yellow); }
 
-    .flow {
-      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.85rem;
+    .tape {
+      margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem;
     }
-    .flow span {
-      font-size: 0.72rem; font-weight: 800;
-      padding: 0.4rem 0.7rem; border-radius: 999px;
-      background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-dim);
+    .tape span {
+      font-size: 0.7rem; font-weight: 900; letter-spacing: 0.04em;
+      padding: 0.4rem 0.65rem; border: 2px solid #fff; background: #121212;
+      transform: rotate(-1deg);
     }
-    .flow span em {
-      font-style: normal; color: var(--accent); margin-right: 0.25rem;
-    }
+    .tape span:nth-child(even) { transform: rotate(1.5deg); background: #1a1a1a; }
+    .tape em { font-style: normal; color: var(--lime); margin-right: 0.3rem; }
 
     footer {
-      margin-top: 1.25rem; text-align: center;
-      font-size: 0.68rem; color: var(--text-dim);
+      margin-top: 1.4rem; text-align: center;
+      font-size: 0.68rem; font-weight: 700; color: var(--mute); letter-spacing: 0.06em;
     }
 
-    /* force-mobile: keep KPI as 3-up; stack main cards */
-    html.force-mobile .kpi-row { grid-template-columns: repeat(3, 1fr) !important; gap: 0.35rem !important; }
-    html.force-mobile .kpi { padding: 0.45rem 0.25rem !important; }
-    html.force-mobile .kpi-val { font-size: 1.25rem !important; }
-    html.force-mobile .kpi-label { font-size: 0.6rem !important; }
-    html.force-mobile .main-grid {
+    html.force-mobile .kpi-row { grid-template-columns: repeat(3, 1fr) !important; }
+    html.force-mobile .kpi-val { font-size: 1.3rem !important; }
+    html.force-mobile .board {
       grid-template-columns: 1fr !important;
       grid-template-areas:
-        "crew"
-        "kiosk"
-        "ops"
-        "session"
-        "actions" !important;
+        "crew" "kiosk" "ops" "session" "run" !important;
     }
-    html.force-mobile .crew { min-height: 180px; }
+    /* fix: class name is board */
+    html.force-mobile .board { display: grid; }
     html.force-mobile .wrap { padding-right: 1rem !important; padding-left: 1rem !important; }
+    html.force-mobile h1 { font-size: 2rem !important; }
+    html.force-mobile .crew { min-height: 200px; }
 
     @media (max-width: 720px) {
-      .main-grid {
+      .board {
         grid-template-columns: 1fr;
-        grid-template-areas: "crew" "kiosk" "ops" "session" "actions";
+        grid-template-areas: "crew" "kiosk" "ops" "session" "run";
       }
-      .kpi-row { grid-template-columns: repeat(3, 1fr); }
-      .wrap { padding-right: 1.25rem; }
+      .wrap { padding-right: 1.2rem; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="topbar">
-      <div class="logo"><span class="logo-mark">FW</span> FLYWHEEL</div>
-      <div class="live-label"><span class="pulse-dot" aria-hidden="true"></span>LIVE</div>
-    </div>
+    <header class="hero">
+      <div class="brand-block">
+        <div class="sticker">STREET CREW OS</div>
+        <h1>FLYWHEEL<br><span>CREW</span></h1>
+        <p class="tag">혼자 와도 · 같이 돈다</p>
+      </div>
+      <div class="live" aria-label="라이브"><i></i>LIVE</div>
+    </header>
 
     <section class="kpi-row" aria-label="오늘 현황">
-      <div class="kpi book">
-        <span class="kpi-label">예약</span>
-        <span class="kpi-val" id="kpiBookings">0</span>
-      </div>
-      <div class="kpi in">
-        <span class="kpi-label">입장</span>
-        <span class="kpi-val" id="kpiCheckins">0</span>
-      </div>
-      <div class="kpi ns">
-        <span class="kpi-label">노쇼</span>
-        <span class="kpi-val" id="kpiNoshow">0</span>
-      </div>
+      <div class="kpi book"><span class="kpi-label">예약</span><span class="kpi-val" id="kpiBookings">0</span></div>
+      <div class="kpi in"><span class="kpi-label">입장</span><span class="kpi-val" id="kpiCheckins">0</span></div>
+      <div class="kpi ns"><span class="kpi-label">노쇼</span><span class="kpi-val" id="kpiNoshow">0</span></div>
     </section>
 
-    <section class="main-grid" aria-label="메인">
+    <section class="board" aria-label="메인">
       <a class="card crew" href="session/">
-        <div class="card-ico">🔥</div>
+        <div class="card-eyebrow">CREW ZONE</div>
         <div class="card-title">크루 동반</div>
-        <div class="card-sub">혼자 와도 같이 도는 세션</div>
-        <div class="crew-avatars" id="crewAvatars" aria-hidden="true"></div>
-        <div class="crew-stat"><strong id="crewCount">0</strong><span>명 활동 중</span></div>
+        <div class="card-sub">오프라인처럼 입장하고<br>같은 타이머로 같이 땀</div>
+        <div class="crew-avatars" id="crewAvatars"></div>
+        <div class="crew-stat"><strong id="crewCount">0</strong><span>명 ON</span></div>
       </a>
 
       <a class="card kiosk" href="kiosk/">
-        <div class="card-ico">📱</div>
+        <div class="card-eyebrow">CHECK-IN</div>
         <div class="card-title">키오스크</div>
         <div class="card-sub">번호로 바로 입장</div>
-        <span class="card-go">열기 →</span>
+        <span class="card-go">GO →</span>
       </a>
 
       <a class="card ops" href="ops/">
-        <div class="card-ico">📡</div>
+        <div class="card-eyebrow">OPS</div>
         <div class="card-title">관제</div>
-        <div class="card-sub">슬롯 · 데모 한 방</div>
-        <span class="card-go">열기 →</span>
+        <div class="card-sub">데모 한 방 · 슬롯</div>
+        <span class="card-go">GO →</span>
       </a>
 
       <a class="card session" href="session/">
-        <div class="card-ico">⏱️</div>
+        <div class="card-eyebrow">SESSION</div>
         <div class="card-title">세션</div>
         <div class="card-sub">타이머 · 음성 · 링</div>
-        <span class="card-go">열기 →</span>
+        <span class="card-go">GO →</span>
       </a>
 
-      <div class="card actions">
-        <div class="card-ico">⚡</div>
+      <div class="card run">
+        <div class="card-eyebrow">QUICK</div>
         <div class="card-title">빠른 실행</div>
         <div class="act-btns">
           <button type="button" class="seed" id="btnSeed">데모 시드</button>
@@ -306,14 +245,14 @@
       </div>
     </section>
 
-    <div class="flow" aria-label="흐름">
-      <span><em>1</em>예약</span>
-      <span><em>2</em>입장</span>
-      <span><em>3</em>관제</span>
-      <span><em>4</em>세션</span>
+    <div class="tape" aria-label="흐름">
+      <span><em>01</em>예약</span>
+      <span><em>02</em>입장</span>
+      <span><em>03</em>관제</span>
+      <span><em>04</em>세션</span>
     </div>
 
-    <footer>플라이휠 OS · 같은 브라우저에서 상태 공유</footer>
+    <footer>FLYWHEEL OS · STREET CREW ENERGY</footer>
   </div>
 
   <script src="shared/store.js"></script>
@@ -321,26 +260,21 @@
   <script>
     (function () {
       const $ = (id) => document.getElementById(id);
-      const COLORS = ["#5b9dff", "#00e5a0", "#ffb020", "#ff6bcb", "#b794f6", "#ff4d6a"];
-      const FALLBACK = ["민*", "준*", "하*", "서*", "윤*", "지*"];
+      const COLORS = ["#ff2d6a", "#5b5bff", "#07070a", "#ff6a00", "#2de2e6", "#9b5de5"];
+      const NAMES = ["민", "준", "하", "서", "윤", "지"];
 
-      function initials(name) {
-        const s = String(name || "?").replace(/\*/g, "").trim();
-        return (s.slice(0, 1) || "?");
-      }
-
-      function renderCrew(count) {
+      function renderCrew(n) {
         const box = $("crewAvatars");
-        const n = Math.max(count, 4);
+        const count = Math.max(n, 4);
         box.innerHTML = "";
-        for (let i = 0; i < Math.min(n, 6); i++) {
+        for (let i = 0; i < Math.min(count, 6); i++) {
           const el = document.createElement("div");
           el.className = "crew-av";
           el.style.background = COLORS[i % COLORS.length];
-          el.textContent = initials(FALLBACK[i]);
+          el.textContent = NAMES[i];
           box.appendChild(el);
         }
-        $("crewCount").textContent = String(Math.max(count, 4));
+        $("crewCount").textContent = String(Math.max(n, 4));
       }
 
       function refresh() {
