@@ -589,3 +589,13 @@ html.force-mobile .key {
 .toast-stack {
   z-index: 250;
 }
+
+
+/* Hub KPI must stay 3-up even in force-mobile */
+html.force-mobile .kpi-row {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+html.force-mobile .main-grid {
+  /* hub uses .main-grid as named areas — allow page CSS to win if more specific */
+}
+

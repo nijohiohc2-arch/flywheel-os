@@ -8,264 +8,312 @@
   <link rel="stylesheet" href="shared/viewport.css" />
   <style>
     :root {
-      --bg: #0a0e14;
+      --bg: #070b12;
       --bg-elev: #121820;
       --bg-card: #1a222d;
       --border: #2a3544;
       --text: #f0f4f8;
       --text-dim: #8b9aab;
       --accent: #00e5a0;
-      --accent-dim: #00b87a;
       --amber: #ffb020;
       --red: #ff4d6a;
       --blue: #5b9dff;
-      --radius: 14px;
+      --violet: #b794f6;
+      --pink: #ff6bcb;
+      --radius: 16px;
       --font: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-    }
+    html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); }
     body {
       background:
-        radial-gradient(ellipse at 15% -10%, rgba(0, 229, 160, 0.1), transparent 45%),
-        radial-gradient(ellipse at 90% 10%, rgba(91, 157, 255, 0.07), transparent 40%),
+        radial-gradient(ellipse at 10% -5%, rgba(0, 229, 160, 0.18), transparent 42%),
+        radial-gradient(ellipse at 95% 5%, rgba(255, 107, 203, 0.12), transparent 38%),
+        radial-gradient(ellipse at 50% 100%, rgba(91, 157, 255, 0.1), transparent 45%),
         var(--bg);
     }
     .wrap {
-      max-width: 960px;
+      max-width: 920px;
       margin: 0 auto;
-      /* Clear fixed viewport toggle (top-right) */
-      padding: 3.25rem 1.25rem 2.5rem;
+      padding: 3rem 1.25rem 2.25rem;
       padding-right: max(1.25rem, 7.5rem);
     }
     .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 1.1rem;
-      flex-wrap: wrap;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.75rem; margin-bottom: 0.85rem; flex-wrap: wrap;
     }
     .logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      color: var(--accent);
-      font-size: 0.85rem;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-weight: 900; letter-spacing: 0.08em; color: var(--accent); font-size: 0.82rem;
     }
     .logo-mark {
-      width: 1.85rem; height: 1.85rem;
-      display: grid; place-items: center;
-      border-radius: 0.45rem;
+      width: 1.9rem; height: 1.9rem; display: grid; place-items: center;
+      border-radius: 0.5rem;
       background: linear-gradient(135deg, var(--accent), #1ec8ff);
-      color: #04110a;
-      font-size: 0.75rem;
+      color: #04110a; font-size: 0.72rem; font-weight: 900;
+      box-shadow: 0 0 20px rgba(0, 229, 160, 0.35);
     }
-    .topbar h1 {
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text);
+    .pulse-dot {
+      width: 0.55rem; height: 0.55rem; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 0 0 rgba(0,229,160,0.6);
+      animation: live 1.6s ease-out infinite;
     }
-    .dash {
-      display: grid;
-      gap: 0.75rem;
+    @keyframes live {
+      0% { box-shadow: 0 0 0 0 rgba(0,229,160,0.55); }
+      70% { box-shadow: 0 0 0 8px rgba(0,229,160,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,229,160,0); }
     }
+    .live-label { font-size: 0.75rem; color: var(--text-dim); font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    /* KPI: compact 3 in one row — always */
     .kpi-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0.65rem;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
     }
     .kpi {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0.85rem 0.9rem;
+      border-radius: 12px;
+      padding: 0.55rem 0.5rem 0.65rem;
       text-align: center;
       min-width: 0;
+      border: 1px solid transparent;
+      position: relative;
+      overflow: hidden;
     }
-    .kpi-label { font-size: 0.72rem; color: var(--text-dim); display: block; margin-bottom: 0.25rem; font-weight: 600; }
-    .kpi-val { font-size: 1.75rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
-    .kpi.book .kpi-val { color: var(--blue); }
-    .kpi.in .kpi-val { color: var(--accent); }
-    .kpi.ns .kpi-val { color: var(--red); }
+    .kpi::after {
+      content: ""; position: absolute; inset: auto -20% -40% -20%; height: 70%;
+      background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 65%);
+      pointer-events: none;
+    }
+    .kpi.book { background: linear-gradient(160deg, rgba(91,157,255,0.28), rgba(91,157,255,0.06)); border-color: rgba(91,157,255,0.45); }
+    .kpi.in { background: linear-gradient(160deg, rgba(0,229,160,0.28), rgba(0,229,160,0.06)); border-color: rgba(0,229,160,0.45); }
+    .kpi.ns { background: linear-gradient(160deg, rgba(255,77,106,0.28), rgba(255,77,106,0.06)); border-color: rgba(255,77,106,0.45); }
+    .kpi-label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em; opacity: 0.9; display: block; margin-bottom: 0.15rem; }
+    .kpi.book .kpi-label { color: #a8c9ff; }
+    .kpi.in .kpi-label { color: #7dffc4; }
+    .kpi.ns .kpi-label { color: #ff9aab; }
+    .kpi-val { font-size: 1.55rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
+    .kpi.book .kpi-val { color: #d6e6ff; }
+    .kpi.in .kpi-val { color: #b8ffe0; }
+    .kpi.ns .kpi-val { color: #ffd0d8; }
 
-    .tile-grid {
+    .main-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.65rem;
+      grid-template-columns: 1.35fr 1fr 1fr;
+      grid-template-areas:
+        "crew kiosk ops"
+        "crew session actions";
+      gap: 0.7rem;
     }
-    .tile {
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
+    .card {
       border-radius: var(--radius);
-      padding: 0.9rem 0.85rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
+      padding: 1rem 0.95rem;
+      border: 1px solid var(--border);
       min-width: 0;
       text-decoration: none;
       color: inherit;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    a.tile:hover {
-      border-color: var(--accent-dim);
-      box-shadow: 0 0 0 1px rgba(0, 229, 160, 0.15);
-    }
-    .tile-top {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      gap: 0.55rem;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    a.card:hover { transform: translateY(-2px); }
+    .card-ico { font-size: 1.45rem; line-height: 1; }
+    .card-title { font-size: 1.05rem; font-weight: 900; letter-spacing: -0.02em; }
+    .card-sub { font-size: 0.78rem; color: rgba(255,255,255,0.72); line-height: 1.35; font-weight: 600; }
+    .card-go {
+      margin-top: auto; align-self: flex-start;
+      font-size: 0.72rem; font-weight: 800;
+      padding: 0.35rem 0.65rem; border-radius: 999px;
+      background: rgba(0,0,0,0.25);
+    }
+
+    .crew {
+      grid-area: crew;
+      background: linear-gradient(145deg, #00c98a 0%, #1ec8ff 55%, #7b6cff 100%);
+      border: none;
+      color: #041018;
+      box-shadow: 0 12px 40px rgba(0, 200, 140, 0.28), 0 0 0 1px rgba(255,255,255,0.12) inset;
+      min-height: 220px;
+    }
+    .crew .card-title { color: #041018; font-size: 1.25rem; }
+    .crew .card-sub { color: rgba(4,16,24,0.72); }
+    .crew-avatars {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.25rem;
+    }
+    .crew-av {
+      width: 2.35rem; height: 2.35rem; border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 0.72rem; font-weight: 900; color: #fff;
+      border: 2px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      animation: bob 2.4s ease-in-out infinite;
+    }
+    .crew-av:nth-child(2) { animation-delay: 0.2s; }
+    .crew-av:nth-child(3) { animation-delay: 0.4s; }
+    .crew-av:nth-child(4) { animation-delay: 0.6s; }
+    .crew-av:nth-child(5) { animation-delay: 0.8s; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .crew-stat {
+      margin-top: auto;
+      display: flex; align-items: baseline; gap: 0.35rem;
+      font-weight: 900;
+    }
+    .crew-stat strong { font-size: 1.75rem; line-height: 1; }
+    .crew-stat span { font-size: 0.8rem; opacity: 0.75; }
+
+    .kiosk { grid-area: kiosk; background: linear-gradient(160deg, rgba(91,157,255,0.35), rgba(91,157,255,0.08)); border-color: rgba(91,157,255,0.55); }
+    .kiosk .card-title { color: #cfe0ff; }
+    .kiosk:hover { box-shadow: 0 10px 28px rgba(91,157,255,0.25); }
+
+    .ops { grid-area: ops; background: linear-gradient(160deg, rgba(255,176,32,0.32), rgba(255,176,32,0.08)); border-color: rgba(255,176,32,0.55); }
+    .ops .card-title { color: #ffe2a8; }
+    .ops:hover { box-shadow: 0 10px 28px rgba(255,176,32,0.22); }
+
+    .session { grid-area: session; background: linear-gradient(160deg, rgba(183,148,246,0.35), rgba(183,148,246,0.08)); border-color: rgba(183,148,246,0.55); }
+    .session .card-title { color: #e4d4ff; }
+    .session:hover { box-shadow: 0 10px 28px rgba(183,148,246,0.25); }
+
+    .actions {
+      grid-area: actions;
+      background: linear-gradient(160deg, rgba(255,107,203,0.28), rgba(255,107,203,0.07));
+      border-color: rgba(255,107,203,0.5);
       gap: 0.45rem;
     }
-    .tile-ico { font-size: 1.2rem; line-height: 1; }
-    .tile-title { font-size: 0.95rem; font-weight: 800; }
-    .tile-sub {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      line-height: 1.35;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .actions .card-title { color: #ffd0ee; }
+    .act-btns { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.15rem; }
+    .act-btns button {
+      appearance: none; border: none; cursor: pointer; font: inherit; font-weight: 800;
+      min-height: 44px; border-radius: 12px; padding: 0.55rem 0.75rem; font-size: 0.85rem;
     }
-    .chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
+    .act-btns .seed {
+      background: linear-gradient(180deg, #00e5a0, #00b87a); color: #04140e;
+      box-shadow: 0 6px 18px rgba(0,229,160,0.3);
     }
-    .chip {
-      appearance: none;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text);
-      font: inherit;
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 0.45rem 0.75rem;
-      border-radius: 999px;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      min-height: 40px;
-      transition: border-color 0.12s, color 0.12s, background 0.12s;
+    .act-btns .reset {
+      background: rgba(0,0,0,0.28); color: #ffd0ee; border: 1px solid rgba(255,255,255,0.12);
     }
-    .chip:hover { border-color: var(--accent-dim); color: var(--accent); }
-    .chip-num {
-      width: 1.25rem; height: 1.25rem;
-      border-radius: 50%;
-      background: rgba(0, 229, 160, 0.18);
-      color: var(--accent);
-      font-size: 0.7rem;
-      font-weight: 900;
-      display: grid; place-items: center;
-    }
-    .chip.primary {
-      background: linear-gradient(180deg, var(--accent), var(--accent-dim));
-      color: #04140e;
-      border-color: transparent;
-    }
-    .chip.primary:hover { filter: brightness(1.06); color: #04140e; }
-    .chip.ghost { color: var(--text-dim); }
 
-    .crew-tile {
-      grid-column: 1 / -1;
-      background: linear-gradient(135deg, rgba(0, 229, 160, 0.08), rgba(91, 157, 255, 0.06));
-      border-color: rgba(0, 229, 160, 0.35);
+    .flow {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.85rem;
     }
-    .crew-tile .tile-title { color: var(--accent); }
+    .flow span {
+      font-size: 0.72rem; font-weight: 800;
+      padding: 0.4rem 0.7rem; border-radius: 999px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-dim);
+    }
+    .flow span em {
+      font-style: normal; color: var(--accent); margin-right: 0.25rem;
+    }
 
     footer {
-      margin-top: 1.25rem;
-      text-align: center;
-      font-size: 0.7rem;
-      color: var(--text-dim);
+      margin-top: 1.25rem; text-align: center;
+      font-size: 0.68rem; color: var(--text-dim);
     }
+
+    /* force-mobile: keep KPI as 3-up; stack main cards */
+    html.force-mobile .kpi-row { grid-template-columns: repeat(3, 1fr) !important; gap: 0.35rem !important; }
+    html.force-mobile .kpi { padding: 0.45rem 0.25rem !important; }
+    html.force-mobile .kpi-val { font-size: 1.25rem !important; }
+    html.force-mobile .kpi-label { font-size: 0.6rem !important; }
+    html.force-mobile .main-grid {
+      grid-template-columns: 1fr !important;
+      grid-template-areas:
+        "crew"
+        "kiosk"
+        "ops"
+        "session"
+        "actions" !important;
+    }
+    html.force-mobile .crew { min-height: 180px; }
+    html.force-mobile .wrap { padding-right: 1rem !important; padding-left: 1rem !important; }
 
     @media (max-width: 720px) {
-      .kpi-row, .tile-grid { grid-template-columns: 1fr; }
+      .main-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas: "crew" "kiosk" "ops" "session" "actions";
+      }
+      .kpi-row { grid-template-columns: repeat(3, 1fr); }
       .wrap { padding-right: 1.25rem; }
     }
-
-    /* force-mobile: 1-col stack */
-    html.force-mobile .kpi-row,
-    html.force-mobile .tile-grid {
-      grid-template-columns: 1fr !important;
-    }
-    html.force-mobile .crew-tile { grid-column: auto; }
-    html.force-mobile .kpi-val { font-size: 1.5rem !important; }
-    html.force-mobile .wrap {
-      padding-top: 1.5rem !important;
-      padding-right: 1rem !important;
-      padding-left: 1rem !important;
-    }
-    html.force-mobile .chip { min-height: 44px; }
-    html.force-mobile .tile-sub { white-space: normal; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="logo"><span class="logo-mark">FW</span> FLYWHEEL OS</div>
-      <h1>연결 데모 허브</h1>
+      <div class="logo"><span class="logo-mark">FW</span> FLYWHEEL</div>
+      <div class="live-label"><span class="pulse-dot" aria-hidden="true"></span>LIVE</div>
     </div>
 
-    <div class="dash">
-      <section class="kpi-row" aria-label="실시간 KPI">
-        <div class="kpi book">
-          <span class="kpi-label">예약</span>
-          <span class="kpi-val" id="kpiBookings">0</span>
-        </div>
-        <div class="kpi in">
-          <span class="kpi-label">입장</span>
-          <span class="kpi-val" id="kpiCheckins">0</span>
-        </div>
-        <div class="kpi ns">
-          <span class="kpi-label">노쇼</span>
-          <span class="kpi-val" id="kpiNoshow">0</span>
-        </div>
-      </section>
-
-      <section class="tile-grid" aria-label="대시보드">
-        <a class="tile" href="kiosk/">
-          <div class="tile-top"><span class="tile-ico">📱</span><span class="tile-title">키오스크</span></div>
-          <div class="tile-sub">번호 체크인</div>
-        </a>
-        <a class="tile" href="ops/">
-          <div class="tile-top"><span class="tile-ico">🖥️</span><span class="tile-title">관제</span></div>
-          <div class="tile-sub">KPI · 슬롯 · 데모</div>
-        </a>
-        <a class="tile" href="session/">
-          <div class="tile-top"><span class="tile-ico">⏱️</span><span class="tile-title">세션</span></div>
-          <div class="tile-sub">타이머 · 링 · 음성</div>
-        </a>
-
-        <article class="tile crew-tile" aria-label="크루">
-          <div class="tile-top"><span class="tile-ico">👥</span><span class="tile-title">크루 동반</span></div>
-          <div class="tile-sub">세션 스크린 · 가상 크루 · 순간 오버레이</div>
-        </article>
-      </section>
-
-      <div class="chip-row" aria-label="플로우">
-        <span class="chip" aria-hidden="true"><span class="chip-num">1</span>예약</span>
-        <span class="chip" aria-hidden="true"><span class="chip-num">2</span>입장</span>
-        <span class="chip" aria-hidden="true"><span class="chip-num">3</span>관제</span>
-        <span class="chip" aria-hidden="true"><span class="chip-num">4</span>세션</span>
+    <section class="kpi-row" aria-label="오늘 현황">
+      <div class="kpi book">
+        <span class="kpi-label">예약</span>
+        <span class="kpi-val" id="kpiBookings">0</span>
       </div>
-
-      <div class="chip-row" aria-label="액션">
-        <button type="button" class="chip primary" id="btnSeed">데모 예약 시드</button>
-        <button type="button" class="chip ghost" id="btnReset">전체 초기화</button>
+      <div class="kpi in">
+        <span class="kpi-label">입장</span>
+        <span class="kpi-val" id="kpiCheckins">0</span>
       </div>
+      <div class="kpi ns">
+        <span class="kpi-label">노쇼</span>
+        <span class="kpi-val" id="kpiNoshow">0</span>
+      </div>
+    </section>
+
+    <section class="main-grid" aria-label="메인">
+      <a class="card crew" href="session/">
+        <div class="card-ico">🔥</div>
+        <div class="card-title">크루 동반</div>
+        <div class="card-sub">혼자 와도 같이 도는 세션</div>
+        <div class="crew-avatars" id="crewAvatars" aria-hidden="true"></div>
+        <div class="crew-stat"><strong id="crewCount">0</strong><span>명 활동 중</span></div>
+      </a>
+
+      <a class="card kiosk" href="kiosk/">
+        <div class="card-ico">📱</div>
+        <div class="card-title">키오스크</div>
+        <div class="card-sub">번호로 바로 입장</div>
+        <span class="card-go">열기 →</span>
+      </a>
+
+      <a class="card ops" href="ops/">
+        <div class="card-ico">📡</div>
+        <div class="card-title">관제</div>
+        <div class="card-sub">슬롯 · 데모 한 방</div>
+        <span class="card-go">열기 →</span>
+      </a>
+
+      <a class="card session" href="session/">
+        <div class="card-ico">⏱️</div>
+        <div class="card-title">세션</div>
+        <div class="card-sub">타이머 · 음성 · 링</div>
+        <span class="card-go">열기 →</span>
+      </a>
+
+      <div class="card actions">
+        <div class="card-ico">⚡</div>
+        <div class="card-title">빠른 실행</div>
+        <div class="act-btns">
+          <button type="button" class="seed" id="btnSeed">데모 시드</button>
+          <button type="button" class="reset" id="btnReset">초기화</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="flow" aria-label="흐름">
+      <span><em>1</em>예약</span>
+      <span><em>2</em>입장</span>
+      <span><em>3</em>관제</span>
+      <span><em>4</em>세션</span>
     </div>
 
-    <footer>플라이휠 OS v0 · nijohiohc2-arch/flywheel-os · GitHub Pages</footer>
+    <footer>플라이휠 OS · 같은 브라우저에서 상태 공유</footer>
   </div>
 
   <script src="shared/store.js"></script>
@@ -273,17 +321,38 @@
   <script>
     (function () {
       const $ = (id) => document.getElementById(id);
+      const COLORS = ["#5b9dff", "#00e5a0", "#ffb020", "#ff6bcb", "#b794f6", "#ff4d6a"];
+      const FALLBACK = ["민*", "준*", "하*", "서*", "윤*", "지*"];
+
+      function initials(name) {
+        const s = String(name || "?").replace(/\*/g, "").trim();
+        return (s.slice(0, 1) || "?");
+      }
+
+      function renderCrew(count) {
+        const box = $("crewAvatars");
+        const n = Math.max(count, 4);
+        box.innerHTML = "";
+        for (let i = 0; i < Math.min(n, 6); i++) {
+          const el = document.createElement("div");
+          el.className = "crew-av";
+          el.style.background = COLORS[i % COLORS.length];
+          el.textContent = initials(FALLBACK[i]);
+          box.appendChild(el);
+        }
+        $("crewCount").textContent = String(Math.max(count, 4));
+      }
+
       function refresh() {
         FlywheelStore.ensureSeeded();
         const c = FlywheelStore.counts();
         $("kpiBookings").textContent = String(c.total);
         $("kpiCheckins").textContent = String(c.checkedIn);
         $("kpiNoshow").textContent = String(c.noshow);
+        renderCrew(c.checkedIn || 0);
       }
-      $("btnSeed").addEventListener("click", () => {
-        FlywheelStore.seedDemo();
-        refresh();
-      });
+
+      $("btnSeed").addEventListener("click", () => { FlywheelStore.seedDemo(); refresh(); });
       $("btnReset").addEventListener("click", () => {
         localStorage.removeItem(FlywheelStore.KEY);
         FlywheelStore.seedDemo();
