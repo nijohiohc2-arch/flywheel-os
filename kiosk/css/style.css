@@ -39,6 +39,9 @@ html, body {
   height: 100%;
   max-width: 540px;
   margin: 0 auto;
+  /* Clear fixed viewport toggle (top-right) on desktop */
+  padding-top: 2.75rem;
+  padding-right: 0.5rem;
   background:
     radial-gradient(ellipse at 50% -10%, rgba(0, 229, 160, 0.08), transparent 50%),
     var(--bg);
@@ -658,3 +661,9 @@ html.force-mobile button.primary {
   width: 100%;
 }
 
+
+
+html.force-mobile .app {
+  padding-top: 0 !important;
+  padding-right: 0 !important;
+}

@@ -7,12 +7,19 @@
   const SLOT_MINUTES = 45;
   const TICK_MS = 2000;
   const TZ = "Asia/Seoul";
+  const TOAST_MAX = 3;
+  const DEMO_CHECKIN_MS = 2500;
 
   const state = {
     offsetMinutes: 0,
     focusedSlotId: null,
     slots: [],
     freedSeats: 0,
+    demo: {
+      running: false,
+      timers: [],
+      step: 0,
+    },
   };
 
   function nowMs() {
@@ -95,7 +102,6 @@
     const checkIns = store.checkIns || {};
     const bookings = store.bookings || [];
 
-    // Group by slotStartISO (rounded to minute)
     const groups = new Map();
     bookings.forEach((b) => {
       const startMs = new Date(b.slotStartISO).getTime();
@@ -136,7 +142,6 @@
         };
       });
 
-    // If no slots somehow, keep empty
     state.slots = slots;
     state.freedSeats = slots.reduce((s, sl) => s + sl.freedByNoshow, 0);
 
@@ -154,7 +159,6 @@
     const t = nowMs();
     const flipped = [];
 
-    // Mutate shared store for bookings past grace without check-in
     FlywheelStore.update((draft) => {
       draft.bookings.forEach((b) => {
         if (b.status === "noshow" || draft.checkIns[b.id] || b.status === "checked_in") return;
@@ -225,11 +229,16 @@
 
   function showToast(title, body, type = "warn") {
     const stack = $("toastStack");
+    if (!stack) return;
+    while (stack.children.length >= TOAST_MAX) {
+      stack.firstElementChild.remove();
+    }
     const el = document.createElement("div");
     el.className = `toast ${type === "ok" ? "ok" : type === "info" ? "info" : ""}`;
     el.innerHTML = `<div class="toast-title">${title}</div><div class="toast-body">${body}</div>`;
     stack.appendChild(el);
     setTimeout(() => {
+      if (!el.parentNode) return;
       el.style.opacity = "0";
       el.style.transition = "opacity 0.3s";
       setTimeout(() => el.remove(), 300);
@@ -267,7 +276,7 @@
   function renderCurrentSlot() {
     const slot = getFocusedSlot();
     if (!slot) {
-      $("bookingList").innerHTML = `<div class="empty-state">예약이 없습니다. 「데모 예약 시드」를 눌러 주세요.</div>`;
+      $("bookingList").innerHTML = `<div class="empty-state">예약이 없습니다. 「데모 시작」을 눌러 주세요.</div>`;
       return;
     }
 
@@ -390,48 +399,167 @@
       .join("");
   }
 
+  function syncDemoUi() {
+    const btn = $("btnDemoToggle");
+    const badge = $("demoBadge");
+    if (!btn) return;
+    if (state.demo.running) {
+      btn.textContent = "데모 중지";
+      btn.setAttribute("aria-pressed", "true");
+      btn.classList.add("running");
+      if (badge) badge.hidden = false;
+    } else {
+      btn.textContent = "데모 시작";
+      btn.setAttribute("aria-pressed", "false");
+      btn.classList.remove("running");
+      if (badge) badge.hidden = true;
+    }
+  }
+
   function renderAll() {
     renderClock();
     renderKpis();
     renderCurrentSlot();
     renderTimeline();
     renderShooting();
+    syncDemoUi();
   }
 
-  function bindControls() {
-    $("btnOffsetMinus5").addEventListener("click", () => { state.offsetMinutes -= 5; tick(true); });
-    $("btnOffsetMinus1").addEventListener("click", () => { state.offsetMinutes -= 1; tick(true); });
-    $("btnOffsetPlus1").addEventListener("click", () => { state.offsetMinutes += 1; tick(true); });
-    $("btnOffsetPlus5").addEventListener("click", () => { state.offsetMinutes += 5; tick(true); });
-    $("btnOffsetReset").addEventListener("click", () => {
-      state.offsetMinutes = 0;
-      tick(true);
-      showToast("시계 오프셋 리셋", "실제 시각으로 복귀했습니다.", "info");
+  function clearDemoTimers() {
+    state.demo.timers.forEach((id) => clearTimeout(id));
+    state.demo.timers = [];
+  }
+
+  function scheduleDemo(fn, ms) {
+    const id = setTimeout(() => {
+      state.demo.timers = state.demo.timers.filter((t) => t !== id);
+      if (!state.demo.running) return;
+      fn();
+    }, ms);
+    state.demo.timers.push(id);
+  }
+
+  function waitingReservedBookings() {
+    const store = FlywheelStore.load();
+    return (store.bookings || []).filter(
+      (b) => b.status === "reserved" && !store.checkIns[b.id]
+    );
+  }
+
+  function demoCheckInNext() {
+    if (!state.demo.running) return;
+    const waiting = waitingReservedBookings();
+    // Prefer current/near-now slots that aren't already past grace target
+    const sorted = waiting.slice().sort((a, b) => {
+      return new Date(a.slotStartISO) - new Date(b.slotStartISO);
     });
-    $("btnRegen").addEventListener("click", () => {
-      state.offsetMinutes = 0;
-      FlywheelStore.seedDemo();
-      rebuildFromStore();
-      renderAll();
-      showToast("데모 예약 시드", "공유 스토어에 오늘 예약을 다시 넣었습니다.", "ok");
-    });
-    $("btnResetCheckins").addEventListener("click", () => {
-      FlywheelStore.update((draft) => {
-        draft.checkIns = {};
-        draft.bookings.forEach((b) => {
-          if (b.status === "checked_in" || b.status === "noshow") b.status = "reserved";
-        });
-        draft.sessionCommand = null;
-      });
-      rebuildFromStore();
-      renderAll();
-      showToast("체크인 초기화", "입장·노쇼를 예약으로 되돌렸습니다.", "info");
-    });
-    $("btnSessionStart").addEventListener("click", () => {
+    // Pick one that is "active-ish" first (offset near now), else first waiting
+    const pick =
+      sorted.find((b) => {
+        const start = new Date(b.slotStartISO).getTime();
+        return Math.abs(start - nowMs()) < 30 * 60 * 1000;
+      }) || sorted[0];
+
+    if (!pick) {
+      showToast("데모", "체크인할 대기 예약이 없습니다.", "info");
+      return;
+    }
+
+    FlywheelStore.recordCheckIn(pick.id, pick.phone);
+    rebuildFromStore();
+    renderAll();
+    showToast("입장 시뮬레이션", `${maskName(pick.name)} · ${maskPhone(pick.phone)}`, "ok");
+    state.demo.step += 1;
+
+    if (state.demo.step === 2) {
+      // After a couple check-ins, fire session start once
       const slot = getFocusedSlot();
       FlywheelStore.setSessionCommand("start", slot ? slot.id : null);
       showToast("세션 시작 신호", "세션 엔진에 start 명령을 보냈습니다.", "ok");
+    }
+
+    if (state.demo.step < 4 && waitingReservedBookings().length > 1) {
+      scheduleDemo(demoCheckInNext, DEMO_CHECKIN_MS);
+    } else {
+      // Advance clock enough to trigger a no-show on one remaining waiting booking
+      scheduleDemo(demoAdvanceForNoshow, 1800);
+    }
+  }
+
+  function demoAdvanceForNoshow() {
+    if (!state.demo.running) return;
+    const waiting = waitingReservedBookings();
+    if (!waiting.length) {
+      showToast("데모", "노쇼 대상 대기 예약이 없습니다.", "info");
+      return;
+    }
+    // Find a waiting booking whose start+grace is closest beyond current offset
+    const meta = FlywheelStore.load().meta || {};
+    const graceMin = meta.noshowGraceMin || 5;
+    let target = waiting[0];
+    let needOffset = 0;
+    waiting.forEach((b) => {
+      const startMs = new Date(b.slotStartISO).getTime();
+      const threshold = startMs + graceMin * 60 * 1000 + 30 * 1000; // +30s past grace
+      const needed = Math.ceil((threshold - Date.now()) / 60000);
+      if (needed > needOffset) {
+        needOffset = needed;
+        target = b;
+      }
     });
+    // Cap advance so UI stays readable
+    const advance = Math.min(Math.max(needOffset, graceMin + 1), 60);
+    state.offsetMinutes = Math.max(state.offsetMinutes, advance);
+    tick();
+    showToast(
+      "시계 진행",
+      `오프셋 +${state.offsetMinutes}분 · ${maskName(target.name)} 노쇼 임계 통과`,
+      "warn"
+    );
+  }
+
+  function startDemo() {
+    if (state.demo.running) return;
+    state.demo.running = true;
+    state.demo.step = 0;
+    clearDemoTimers();
+
+    // 1) Seed if needed (or refresh seed for a clean play)
+    const cur = FlywheelStore.load();
+    if (!cur.bookings || cur.bookings.length === 0) {
+      FlywheelStore.seedDemo();
+    } else {
+      // Soft reseed only when no check-ins yet — otherwise keep existing
+      const hasAnyCheckin = Object.keys(cur.checkIns || {}).length > 0;
+      if (!hasAnyCheckin) {
+        FlywheelStore.seedDemo();
+      }
+    }
+    state.offsetMinutes = 0;
+    rebuildFromStore();
+    renderAll();
+    showToast("데모 시작", "예약 시드 → 입장 → 노쇼 순으로 재생합니다.", "info");
+
+    // 2) Simulate check-ins over time
+    scheduleDemo(demoCheckInNext, 900);
+  }
+
+  function stopDemo() {
+    if (!state.demo.running) return;
+    state.demo.running = false;
+    clearDemoTimers();
+    syncDemoUi();
+    showToast("데모 중지", "자동 재생을 멈췄습니다.", "info");
+  }
+
+  function toggleDemo() {
+    if (state.demo.running) stopDemo();
+    else startDemo();
+  }
+
+  function bindControls() {
+    const btn = $("btnDemoToggle");
+    if (btn) btn.addEventListener("click", toggleDemo);
   }
 
   function tick() {

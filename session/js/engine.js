@@ -416,7 +416,12 @@
 
   function showMoment(kind, title, sub, chips, durationMs) {
     if (!els.momentOverlay) return;
+    // Dismiss any previous moment immediately (only one visible)
     clearTimeout(momentTimer);
+    els.momentOverlay.hidden = true;
+    els.momentOverlay.className = "moment-overlay";
+    // Force reflow so re-show animates cleanly
+    void els.momentOverlay.offsetWidth;
     els.momentOverlay.hidden = false;
     els.momentOverlay.className = "moment-overlay kind-" + (kind || "start");
     els.momentTitle.textContent = title || "";

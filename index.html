@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0a0e14" />
-  <title>플라이휠 OS · 연결 데모</title>
+  <title>플라이휠 OS · 허브</title>
   <link rel="stylesheet" href="shared/viewport.css" />
   <style>
     :root {
@@ -19,7 +19,7 @@
       --amber: #ffb020;
       --red: #ff4d6a;
       --blue: #5b9dff;
-      --radius: 16px;
+      --radius: 14px;
       --font: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,402 +36,237 @@
         var(--bg);
     }
     .wrap {
-      max-width: 1100px;
+      max-width: 960px;
       margin: 0 auto;
-      padding: 2rem 1.5rem 3rem;
+      /* Clear fixed viewport toggle (top-right) */
+      padding: 3.25rem 1.25rem 2.5rem;
+      padding-right: max(1.25rem, 7.5rem);
     }
-    header.hero {
-      text-align: center;
-      margin-bottom: 2rem;
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1.1rem;
+      flex-wrap: wrap;
     }
     .logo {
       display: inline-flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
       font-weight: 900;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       color: var(--accent);
-      font-size: 0.9rem;
-      margin-bottom: 0.75rem;
-    }
-    .logo-mark {
-      width: 2.2rem; height: 2.2rem;
-      display: grid; place-items: center;
-      border-radius: 0.5rem;
-      background: linear-gradient(135deg, var(--accent), #1ec8ff);
-      color: #04110a;
       font-size: 0.85rem;
     }
-    h1 {
-      font-size: clamp(1.75rem, 4vw, 2.4rem);
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      margin-bottom: 0.5rem;
+    .logo-mark {
+      width: 1.85rem; height: 1.85rem;
+      display: grid; place-items: center;
+      border-radius: 0.45rem;
+      background: linear-gradient(135deg, var(--accent), #1ec8ff);
+      color: #04110a;
+      font-size: 0.75rem;
     }
-    .tagline {
-      color: var(--text-dim);
+    .topbar h1 {
       font-size: 1.05rem;
-      line-height: 1.55;
-      max-width: 36rem;
-      margin: 0 auto;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
     }
-    .live-kpis {
+    .dash {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .kpi-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
-      margin: 1.75rem 0 2rem;
+      gap: 0.65rem;
     }
     .kpi {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1rem 1.1rem;
+      padding: 0.85rem 0.9rem;
       text-align: center;
+      min-width: 0;
     }
-    .kpi-label { font-size: 0.8rem; color: var(--text-dim); display: block; margin-bottom: 0.35rem; }
-    .kpi-val { font-size: 2rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .kpi-label { font-size: 0.72rem; color: var(--text-dim); display: block; margin-bottom: 0.25rem; font-weight: 600; }
+    .kpi-val { font-size: 1.75rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
     .kpi.book .kpi-val { color: var(--blue); }
     .kpi.in .kpi-val { color: var(--accent); }
     .kpi.ns .kpi-val { color: var(--red); }
 
-    .flow {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 2rem;
-      position: relative;
-    }
-    .step {
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.1rem 1rem;
-      position: relative;
-    }
-    .step-num {
-      width: 1.75rem; height: 1.75rem;
-      border-radius: 50%;
-      background: rgba(0, 229, 160, 0.15);
-      color: var(--accent);
-      font-weight: 800;
-      font-size: 0.85rem;
-      display: grid; place-items: center;
-      margin-bottom: 0.65rem;
-    }
-    .step h3 { font-size: 1rem; margin-bottom: 0.35rem; }
-    .step p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.45; }
-
-    .panels {
+    .tile-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      gap: 0.65rem;
     }
-    .panel {
+    .tile {
       background: var(--bg-elev);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1.35rem 1.25rem;
+      padding: 0.9rem 0.85rem;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.55rem;
+      min-width: 0;
+      text-decoration: none;
+      color: inherit;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .panel:hover {
+    a.tile:hover {
       border-color: var(--accent-dim);
       box-shadow: 0 0 0 1px rgba(0, 229, 160, 0.15);
     }
-    .panel-icon { font-size: 1.75rem; }
-    .panel h2 { font-size: 1.2rem; font-weight: 800; }
-    .panel p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; flex: 1; }
-    .btn {
-      appearance: none;
-      border: none;
-      border-radius: 12px;
-      font: inherit;
-      font-weight: 800;
-      font-size: 1rem;
-      padding: 0.85rem 1.1rem;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      display: block;
-      transition: filter 0.15s, transform 0.08s;
+    .tile-top {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
     }
-    .btn:active { transform: scale(0.98); }
-    .btn-primary {
-      background: linear-gradient(180deg, var(--accent), var(--accent-dim));
-      color: #04140e;
+    .tile-ico { font-size: 1.2rem; line-height: 1; }
+    .tile-title { font-size: 0.95rem; font-weight: 800; }
+    .tile-sub {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .btn-primary:hover { filter: brightness(1.06); }
-    .btn-ghost {
-      background: var(--bg-card);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .actions {
+    .chip-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.65rem;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1.5rem;
+      gap: 0.4rem;
     }
-    .actions .btn { min-width: 11rem; }
-    .note {
-      background: var(--bg-card);
+    .chip {
+      appearance: none;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1rem 1.25rem;
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      line-height: 1.55;
-      text-align: center;
-    }
-    .note strong { color: var(--amber); }
-    footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-    @media (max-width: 900px) {
-      .flow, .panels, .live-kpis { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 700px) {
-      h1 { font-size: 1.55rem; }
-      .tagline { font-size: 0.95rem; }
-      .kpi-val { font-size: 1.65rem; }
-      .actions { flex-direction: column; align-items: stretch; }
-      .actions .btn { min-width: 0; width: 100%; min-height: 48px; }
-      .crew-card { grid-template-columns: 1fr; }
-      .crew-mini { grid-template-columns: 1fr; }
-      .btn { min-height: 48px; }
-      .wrap { padding: 1.25rem 1rem 2rem; }
-    }
-
-
-    /* Crew card — amplified preview */
-    .crew-card {
-      background: linear-gradient(135deg, rgba(0, 229, 160, 0.08), rgba(91, 157, 255, 0.06));
-      border: 1px solid rgba(0, 229, 160, 0.35);
-      border-radius: var(--radius);
-      padding: 1.25rem 1.35rem;
-      margin-bottom: 1.5rem;
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 1rem 1.25rem;
-      align-items: start;
-    }
-    .crew-card .crew-icon { font-size: 1.75rem; line-height: 1; }
-    .crew-card h2 { font-size: 1.15rem; font-weight: 900; margin-bottom: 0.4rem; color: var(--accent); }
-    .crew-card > div > p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.55; }
-    .crew-mini {
-      grid-column: 1 / -1;
-      background: #0a0c10;
-      border: 1px solid #2a3344;
-      border-radius: 12px;
-      padding: 0.85rem 1rem;
-      display: grid;
-      grid-template-columns: 1fr 1.1fr;
-      gap: 0.75rem;
-      min-height: 7.5rem;
-    }
-    .crew-mini-stage {
-      background: linear-gradient(180deg, rgba(61,255,154,0.08), rgba(91,157,255,0.05));
-      border: 1px solid rgba(61,255,154,0.25);
-      border-radius: 10px;
-      padding: 0.55rem 0.65rem;
-    }
-    .crew-mini-title {
-      font-size: 0.72rem;
-      font-weight: 900;
+      background: var(--bg-card);
       color: var(--text);
-      margin-bottom: 0.45rem;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      min-height: 40px;
+      transition: border-color 0.12s, color 0.12s, background 0.12s;
     }
-    .crew-mini-title span {
-      display: inline-grid; place-items: center;
-      min-width: 1.1rem; height: 1.1rem; padding: 0 0.3rem;
-      margin-left: 0.2rem; border-radius: 999px;
-      background: var(--accent); color: #04110a; font-size: 0.65rem;
-    }
-    .crew-mini-avs {
-      display: flex; gap: 0.35rem; flex-wrap: wrap;
-    }
-    .crew-mini-av {
-      width: 1.85rem; height: 1.85rem; border-radius: 50%;
+    .chip:hover { border-color: var(--accent-dim); color: var(--accent); }
+    .chip-num {
+      width: 1.25rem; height: 1.25rem;
+      border-radius: 50%;
+      background: rgba(0, 229, 160, 0.18);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 900;
       display: grid; place-items: center;
-      font-size: 0.65rem; font-weight: 900; color: #04110a;
-      background: linear-gradient(135deg, #5b9dff, #00e5a0);
-      border: 2px solid rgba(255,255,255,0.2);
     }
-    .crew-mini-av.ghost { background: linear-gradient(135deg, #3a4a68, #5b9dff); color: #e8f0ff; border-style: dashed; }
-    .crew-mini-right {
-      display: flex; flex-direction: column; justify-content: center; gap: 0.4rem;
+    .chip.primary {
+      background: linear-gradient(180deg, var(--accent), var(--accent-dim));
+      color: #04140e;
+      border-color: transparent;
     }
-    .crew-mini-count {
-      font-size: clamp(1.6rem, 4vw, 2.2rem);
-      font-weight: 900; color: var(--accent); letter-spacing: -0.03em; line-height: 1;
+    .chip.primary:hover { filter: brightness(1.06); color: #04140e; }
+    .chip.ghost { color: var(--text-dim); }
+
+    .crew-tile {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(0, 229, 160, 0.08), rgba(91, 157, 255, 0.06));
+      border-color: rgba(0, 229, 160, 0.35);
     }
-    .crew-mini-marquee {
-      font-size: 0.78rem; font-weight: 800; color: var(--blue);
-      background: rgba(91,157,255,0.1); border: 1px solid rgba(91,157,255,0.3);
-      border-radius: 8px; padding: 0.35rem 0.55rem;
-    }
-    .crew-mini-energy {
-      height: 0.4rem; border-radius: 999px; background: #1c2433; overflow: hidden;
-      border: 1px solid #2a3344;
-    }
-    .crew-mini-energy > i {
-      display: block; height: 100%; width: 62%;
-      background: linear-gradient(90deg, #ffb020, #00e5a0);
-    }
-    .crew-mini-cap {
-      font-size: 0.68rem; color: var(--text-dim); font-weight: 600;
-    }
-    @media (max-width: 560px) {
-      .crew-mini { grid-template-columns: 1fr; }
+    .crew-tile .tile-title { color: var(--accent); }
+
+    footer {
+      margin-top: 1.25rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text-dim);
     }
 
+    @media (max-width: 720px) {
+      .kpi-row, .tile-grid { grid-template-columns: 1fr; }
+      .wrap { padding-right: 1.25rem; }
+    }
 
-  
-    /* force-mobile: desktop viewport still wide — must not rely on @media alone */
-    html.force-mobile .live-kpis,
-    html.force-mobile .flow,
-    html.force-mobile .panels,
-    html.force-mobile .crew-card,
-    html.force-mobile .crew-mini {
+    /* force-mobile: 1-col stack */
+    html.force-mobile .kpi-row,
+    html.force-mobile .tile-grid {
       grid-template-columns: 1fr !important;
     }
-    html.force-mobile .panel {
-      width: 100%;
-      min-width: 0;
-    }
+    html.force-mobile .crew-tile { grid-column: auto; }
     html.force-mobile .kpi-val { font-size: 1.5rem !important; }
-    html.force-mobile h1 { font-size: 1.45rem !important; }
-    html.force-mobile .actions { flex-direction: column; }
-    html.force-mobile .actions .btn,
-    html.force-mobile .btn {
-      width: 100%;
-      min-height: 48px;
+    html.force-mobile .wrap {
+      padding-top: 1.5rem !important;
+      padding-right: 1rem !important;
+      padding-left: 1rem !important;
     }
+    html.force-mobile .chip { min-height: 44px; }
+    html.force-mobile .tile-sub { white-space: normal; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header class="hero">
+    <div class="topbar">
       <div class="logo"><span class="logo-mark">FW</span> FLYWHEEL OS</div>
-      <h1>플라이휠 서킷 · 연결 데모</h1>
-      <p class="tagline">
-        네이버 예약(시뮬) → 키오스크 입장 → 관제 현황 → 세션 엔진.<br />
-        같은 브라우저 프로필에서 <code>flywheel.v0</code> 공유 상태로 세 화면이 동기화됩니다.
-      </p>
-    </header>
-
-    <section class="live-kpis" aria-label="실시간 카운트">
-      <div class="kpi book">
-        <span class="kpi-label">오늘 예약</span>
-        <span class="kpi-val" id="kpiBookings">0</span>
-      </div>
-      <div class="kpi in">
-        <span class="kpi-label">입장 완료</span>
-        <span class="kpi-val" id="kpiCheckins">0</span>
-      </div>
-      <div class="kpi ns">
-        <span class="kpi-label">노쇼</span>
-        <span class="kpi-val" id="kpiNoshow">0</span>
-      </div>
-    </section>
-
-    <section class="flow" aria-label="데모 플로우">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h3>네이버 예약(시뮬)</h3>
-        <p>허브/관제에서 데모 예약을 시드합니다. 전화번호로 당일 슬롯이 생깁니다.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h3>키오스크 입장</h3>
-        <p>키패드로 번호 입력 → 체크인. 공유 스토어에 입장을 기록합니다.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h3>관제 현황</h3>
-        <p>입장·노쇼·잔여 정원을 실시간 반영. 「세션 시작 신호」를 보냅니다.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <h3>세션 엔진</h3>
-        <p>관제 신호를 받아 자동 시작(또는 배너 후 1초). 타이머·음성·링 유지.</p>
-      </div>
-    </section>
-
-    <div class="actions">
-      <button type="button" class="btn btn-primary" id="btnSeed">데모 예약 시드</button>
-      <button type="button" class="btn btn-ghost" id="btnReset">전체 초기화</button>
+      <h1>연결 데모 허브</h1>
     </div>
 
-
-    <article class="crew-card" aria-label="크루 동반">
-      <div class="crew-icon">👥</div>
-      <div>
-        <h2>혼자 와도 크루처럼 — 세션 UI 증폭</h2>
-        <p>
-          짐 스크린에서도 한눈에: 큰 <strong style="color:var(--text)">오늘 크루</strong> 스테이지,
-          링 고스트, 마퀴 전광판, 순간 오버레이(시작·이동·랩·종료), 크루 에너지 바.
-          실체크인 있으면 마스킹 닉, 없으면 가상 크루 4–6명으로 절대 비지 않아요.
-        </p>
-      </div>
-      <div class="crew-mini" aria-hidden="true">
-        <div class="crew-mini-stage">
-          <div class="crew-mini-title">오늘 크루 <span>5</span></div>
-          <div class="crew-mini-avs">
-            <span class="crew-mini-av">민</span>
-            <span class="crew-mini-av ghost">⚡</span>
-            <span class="crew-mini-av ghost">🔥</span>
-            <span class="crew-mini-av ghost">💪</span>
-            <span class="crew-mini-av ghost">✨</span>
-          </div>
+    <div class="dash">
+      <section class="kpi-row" aria-label="실시간 KPI">
+        <div class="kpi book">
+          <span class="kpi-label">예약</span>
+          <span class="kpi-val" id="kpiBookings">0</span>
         </div>
-        <div class="crew-mini-right">
-          <div class="crew-mini-count">04:12</div>
-          <div class="crew-mini-marquee">크루 5명과 같은 타이머 · S3에서 준* 운동 중</div>
-          <div class="crew-mini-energy"><i></i></div>
-          <div class="crew-mini-cap">미리보기 · 세션 엔진 실제 화면은 더 큼</div>
+        <div class="kpi in">
+          <span class="kpi-label">입장</span>
+          <span class="kpi-val" id="kpiCheckins">0</span>
         </div>
+        <div class="kpi ns">
+          <span class="kpi-label">노쇼</span>
+          <span class="kpi-val" id="kpiNoshow">0</span>
+        </div>
+      </section>
+
+      <section class="tile-grid" aria-label="대시보드">
+        <a class="tile" href="kiosk/">
+          <div class="tile-top"><span class="tile-ico">📱</span><span class="tile-title">키오스크</span></div>
+          <div class="tile-sub">번호 체크인</div>
+        </a>
+        <a class="tile" href="ops/">
+          <div class="tile-top"><span class="tile-ico">🖥️</span><span class="tile-title">관제</span></div>
+          <div class="tile-sub">KPI · 슬롯 · 데모</div>
+        </a>
+        <a class="tile" href="session/">
+          <div class="tile-top"><span class="tile-ico">⏱️</span><span class="tile-title">세션</span></div>
+          <div class="tile-sub">타이머 · 링 · 음성</div>
+        </a>
+
+        <article class="tile crew-tile" aria-label="크루">
+          <div class="tile-top"><span class="tile-ico">👥</span><span class="tile-title">크루 동반</span></div>
+          <div class="tile-sub">세션 스크린 · 가상 크루 · 순간 오버레이</div>
+        </article>
+      </section>
+
+      <div class="chip-row" aria-label="플로우">
+        <span class="chip" aria-hidden="true"><span class="chip-num">1</span>예약</span>
+        <span class="chip" aria-hidden="true"><span class="chip-num">2</span>입장</span>
+        <span class="chip" aria-hidden="true"><span class="chip-num">3</span>관제</span>
+        <span class="chip" aria-hidden="true"><span class="chip-num">4</span>세션</span>
       </div>
-    </article>
 
-    <section class="panels" aria-label="패널 열기">
-      <article class="panel">
-        <div class="panel-icon">📱</div>
-        <h2>키오스크</h2>
-        <p>휴대폰 번호 키패드 체크인. 성공 시 공유 스토어에 입장을 기록하고 문 열림을 시뮬레이션합니다.</p>
-        <a class="btn btn-primary" href="kiosk/">키오스크 열기</a>
-      </article>
-      <article class="panel">
-        <div class="panel-icon">🖥️</div>
-        <h2>관제</h2>
-        <p>예약·입장·노쇼 KPI와 슬롯 현황. 노쇼 엔진과 「세션 시작 신호」로 세션 엔진을 깨웁니다.</p>
-        <a class="btn btn-primary" href="ops/">관제 열기</a>
-      </article>
-      <article class="panel">
-        <div class="panel-icon">⏱️</div>
-        <h2>세션 엔진</h2>
-        <p>워밍업·운동·이동·쿨다운 타이머와 스테이션 링, ko-KR 음성 큐. 관제 신호로 자동 시작.</p>
-        <a class="btn btn-primary" href="session/">세션 엔진 열기</a>
-      </article>
-    </section>
-
-    <p class="note">
-      <strong>주의:</strong> localStorage는 <em>같은 브라우저 프로필·같은 origin</em>에서만 공유됩니다.
-      탭을 여러 개 열어 키오스크·관제·세션을 동시에 두면 스토리지 이벤트로 동기화됩니다.
-      시크릿/다른 기기에서는 상태가 보이지 않습니다.
-    </p>
+      <div class="chip-row" aria-label="액션">
+        <button type="button" class="chip primary" id="btnSeed">데모 예약 시드</button>
+        <button type="button" class="chip ghost" id="btnReset">전체 초기화</button>
+      </div>
+    </div>
 
     <footer>플라이휠 OS v0 · nijohiohc2-arch/flywheel-os · GitHub Pages</footer>
   </div>
-
 
   <script src="shared/store.js"></script>
   <script src="shared/viewport.js"></script>
@@ -459,7 +294,5 @@
       setInterval(refresh, 2000);
     })();
   </script>
-
-
 </body>
 </html>

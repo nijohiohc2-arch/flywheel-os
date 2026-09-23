@@ -49,6 +49,17 @@
   outline-offset: -2px;
 }
 
+/* Page content clears the fixed toggle (desktop) */
+@media (min-width: 701px) {
+  body:not(.no-toggle-pad) {
+    /* pages also pad their .wrap/.app; this is a safety net */
+  }
+  .wrap,
+  .app {
+    scroll-padding-top: 4rem;
+  }
+}
+
 /* Real-phone: hide toggle; keep natural mobile CSS */
 @media (max-width: 700px) {
   .fw-viewport-toggle {
@@ -79,6 +90,7 @@
       0 24px 56px rgba(0, 0, 0, 0.55);
     overflow-x: hidden !important;
     overflow-y: auto !important;
+    overflow: hidden auto !important;
     position: relative !important;
     /* Contain position:fixed descendants (overlays/modals/toasts) inside phone column.
        Toggle is appended to <html>, so it stays on the real browser window. */
@@ -531,9 +543,14 @@ html.force-mobile .current-slot {
 /* Hub */
 html.force-mobile .live-kpis,
 html.force-mobile .flow,
-html.force-mobile .panels {
+html.force-mobile .panels,
+html.force-mobile .kpi-row,
+html.force-mobile .tile-grid {
   grid-template-columns: 1fr !important;
   display: grid !important;
+}
+html.force-mobile .crew-tile {
+  grid-column: auto !important;
 }
 html.force-mobile .panel {
   min-width: 0 !important;
@@ -559,3 +576,16 @@ html.force-mobile .key {
   font-size: 1.35rem !important;
 }
 
+
+
+/* Overlay stack hygiene — one moment, toasts capped by page JS */
+.moment-overlay {
+  z-index: 300 !important;
+}
+.moment-overlay[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+}
+.toast-stack {
+  z-index: 250;
+}
