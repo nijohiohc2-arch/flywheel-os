@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0e14" />
+  <title>플라이휠 OS · 연결 데모</title>
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --bg-elev: #121820;
+      --bg-card: #1a222d;
+      --border: #2a3544;
+      --text: #f0f4f8;
+      --text-dim: #8b9aab;
+      --accent: #00e5a0;
+      --accent-dim: #00b87a;
+      --amber: #ffb020;
+      --red: #ff4d6a;
+      --blue: #5b9dff;
+      --radius: 16px;
+      --font: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+    }
+    body {
+      background:
+        radial-gradient(ellipse at 15% -10%, rgba(0, 229, 160, 0.1), transparent 45%),
+        radial-gradient(ellipse at 90% 10%, rgba(91, 157, 255, 0.07), transparent 40%),
+        var(--bg);
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+    }
+    header.hero {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+    .logo-mark {
+      width: 2.2rem; height: 2.2rem;
+      display: grid; place-items: center;
+      border-radius: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #1ec8ff);
+      color: #04110a;
+      font-size: 0.85rem;
+    }
+    h1 {
+      font-size: clamp(1.75rem, 4vw, 2.4rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+    .tagline {
+      color: var(--text-dim);
+      font-size: 1.05rem;
+      line-height: 1.55;
+      max-width: 36rem;
+      margin: 0 auto;
+    }
+    .live-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin: 1.75rem 0 2rem;
+    }
+    .kpi {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      text-align: center;
+    }
+    .kpi-label { font-size: 0.8rem; color: var(--text-dim); display: block; margin-bottom: 0.35rem; }
+    .kpi-val { font-size: 2rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .kpi.book .kpi-val { color: var(--blue); }
+    .kpi.in .kpi-val { color: var(--accent); }
+    .kpi.ns .kpi-val { color: var(--red); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .step {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1rem;
+      position: relative;
+    }
+    .step-num {
+      width: 1.75rem; height: 1.75rem;
+      border-radius: 50%;
+      background: rgba(0, 229, 160, 0.15);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 0.85rem;
+      display: grid; place-items: center;
+      margin-bottom: 0.65rem;
+    }
+    .step h3 { font-size: 1rem; margin-bottom: 0.35rem; }
+    .step p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.45; }
+
+    .panels {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .panel {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.35rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .panel:hover {
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 0 1px rgba(0, 229, 160, 0.15);
+    }
+    .panel-icon { font-size: 1.75rem; }
+    .panel h2 { font-size: 1.2rem; font-weight: 800; }
+    .panel p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; flex: 1; }
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 0.85rem 1.1rem;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      transition: filter 0.15s, transform 0.08s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: linear-gradient(180deg, var(--accent), var(--accent-dim));
+      color: #04140e;
+    }
+    .btn-primary:hover { filter: brightness(1.06); }
+    .btn-ghost {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .actions .btn { min-width: 11rem; }
+    .note {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.55;
+      text-align: center;
+    }
+    .note strong { color: var(--amber); }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    @media (max-width: 900px) {
+      .flow, .panels, .live-kpis { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="logo"><span class="logo-mark">FW</span> FLYWHEEL OS</div>
+      <h1>플라이휠 서킷 · 연결 데모</h1>
+      <p class="tagline">
+        네이버 예약(시뮬) → 키오스크 입장 → 관제 현황 → 세션 엔진.<br />
+        같은 브라우저 프로필에서 <code>flywheel.v0</code> 공유 상태로 세 화면이 동기화됩니다.
+      </p>
+    </header>
+
+    <section class="live-kpis" aria-label="실시간 카운트">
+      <div class="kpi book">
+        <span class="kpi-label">오늘 예약</span>
+        <span class="kpi-val" id="kpiBookings">0</span>
+      </div>
+      <div class="kpi in">
+        <span class="kpi-label">입장 완료</span>
+        <span class="kpi-val" id="kpiCheckins">0</span>
+      </div>
+      <div class="kpi ns">
+        <span class="kpi-label">노쇼</span>
+        <span class="kpi-val" id="kpiNoshow">0</span>
+      </div>
+    </section>
+
+    <section class="flow" aria-label="데모 플로우">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>네이버 예약(시뮬)</h3>
+        <p>허브/관제에서 데모 예약을 시드합니다. 전화번호로 당일 슬롯이 생깁니다.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>키오스크 입장</h3>
+        <p>키패드로 번호 입력 → 체크인. 공유 스토어에 입장을 기록합니다.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>관제 현황</h3>
+        <p>입장·노쇼·잔여 정원을 실시간 반영. 「세션 시작 신호」를 보냅니다.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>세션 엔진</h3>
+        <p>관제 신호를 받아 자동 시작(또는 배너 후 1초). 타이머·음성·링 유지.</p>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button type="button" class="btn btn-primary" id="btnSeed">데모 예약 시드</button>
+      <button type="button" class="btn btn-ghost" id="btnReset">전체 초기화</button>
+    </div>
+
+    <section class="panels" aria-label="패널 열기">
+      <article class="panel">
+        <div class="panel-icon">📱</div>
+        <h2>키오스크</h2>
+        <p>휴대폰 번호 키패드 체크인. 성공 시 공유 스토어에 입장을 기록하고 문 열림을 시뮬레이션합니다.</p>
+        <a class="btn btn-primary" href="kiosk/">키오스크 열기</a>
+      </article>
+      <article class="panel">
+        <div class="panel-icon">🖥️</div>
+        <h2>관제</h2>
+        <p>예약·입장·노쇼 KPI와 슬롯 현황. 노쇼 엔진과 「세션 시작 신호」로 세션 엔진을 깨웁니다.</p>
+        <a class="btn btn-primary" href="ops/">관제 열기</a>
+      </article>
+      <article class="panel">
+        <div class="panel-icon">⏱️</div>
+        <h2>세션 엔진</h2>
+        <p>워밍업·운동·이동·쿨다운 타이머와 스테이션 링, ko-KR 음성 큐. 관제 신호로 자동 시작.</p>
+        <a class="btn btn-primary" href="session/">세션 엔진 열기</a>
+      </article>
+    </section>
+
+    <p class="note">
+      <strong>주의:</strong> localStorage는 <em>같은 브라우저 프로필·같은 origin</em>에서만 공유됩니다.
+      탭을 여러 개 열어 키오스크·관제·세션을 동시에 두면 스토리지 이벤트로 동기화됩니다.
+      시크릿/다른 기기에서는 상태가 보이지 않습니다.
+    </p>
+
+    <footer>플라이휠 OS v0 · nijohiohc2-arch/flywheel-os · GitHub Pages</footer>
+  </div>
+
+  <script src="shared/store.js"></script>
+  <script>
+    (function () {
+      const $ = (id) => document.getElementById(id);
+      function refresh() {
+        FlywheelStore.ensureSeeded();
+        const c = FlywheelStore.counts();
+        $("kpiBookings").textContent = String(c.total);
+        $("kpiCheckins").textContent = String(c.checkedIn);
+        $("kpiNoshow").textContent = String(c.noshow);
+      }
+      $("btnSeed").addEventListener("click", () => {
+        FlywheelStore.seedDemo();
+        refresh();
+      });
+      $("btnReset").addEventListener("click", () => {
+        localStorage.removeItem(FlywheelStore.KEY);
+        FlywheelStore.seedDemo();
+        refresh();
+      });
+      FlywheelStore.subscribe(refresh);
+      refresh();
+      setInterval(refresh, 2000);
+    })();
+  </script>
+</body>
+</html>

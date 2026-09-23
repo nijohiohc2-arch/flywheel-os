@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>플라이휠 OS · 세션 엔진</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- Top bar -->
+    <div id="opsBanner" class="ops-banner" hidden>
+      관제에서 시작 신호 — 시작 누르기 (1초 후 자동 시작)
+    </div>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">FW</span>
+        <span class="brand-name">플라이휠 OS · 세션</span>
+        <a href="../" class="hub-link">← 허브</a>
+      </div>
+      <div class="phase-badge" id="phaseBadge" data-phase="idle">대기</div>
+      <div class="top-meta">
+        <span id="lapLabel">랩 — / —</span>
+        <button type="button" class="icon-btn" id="muteBtn" aria-label="음성 음소거" title="음성">🔊</button>
+      </div>
+    </header>
+
+    <!-- Main display -->
+    <main class="display">
+      <section class="ring-panel" aria-label="스테이션 링">
+        <svg id="stationRing" viewBox="0 0 400 400" role="img" aria-label="10개 스테이션 링">
+          <circle class="ring-track" cx="200" cy="200" r="150" />
+          <g id="stationNodes"></g>
+          <text class="ring-center-label" x="200" y="195" text-anchor="middle">현재</text>
+          <text class="ring-center-name" id="ringCenterName" x="200" y="230" text-anchor="middle">—</text>
+        </svg>
+      </section>
+
+      <section class="countdown-panel">
+        <div class="countdown" id="countdown">--:--</div>
+        <div class="station-row">
+          <div class="station-card current">
+            <span class="station-label">현재 스테이션</span>
+            <span class="station-id" id="currentId">—</span>
+            <span class="station-name" id="currentName">세션 대기</span>
+          </div>
+          <div class="station-card next">
+            <span class="station-label">다음 스테이션</span>
+            <span class="station-id" id="nextId">—</span>
+            <span class="station-name" id="nextName">—</span>
+          </div>
+        </div>
+        <p class="cue-line" id="cueLine">시작을 누르면 워밍업이 시작됩니다.</p>
+      </section>
+    </main>
+
+    <!-- Controls -->
+    <footer class="controls">
+      <div class="control-btns">
+        <button type="button" class="btn primary" id="startBtn">시작</button>
+        <button type="button" class="btn" id="pauseBtn" disabled>일시정지</button>
+        <button type="button" class="btn" id="skipBtn" disabled>단계 건너뛰기</button>
+        <button type="button" class="btn danger" id="resetBtn">리셋</button>
+      </div>
+
+      <details class="settings" id="settingsPanel">
+        <summary>설정</summary>
+        <div class="settings-grid">
+          <label>운동(초)
+            <input type="number" id="workSec" min="5" max="180" value="40" />
+          </label>
+          <label>이동(초)
+            <input type="number" id="moveSec" min="5" max="120" value="20" />
+          </label>
+          <label>랩 수
+            <input type="number" id="laps" min="1" max="20" value="3" />
+          </label>
+          <label>워밍업(분)
+            <input type="number" id="warmupMin" min="0" max="30" value="3" step="0.5" />
+          </label>
+          <label>쿨다운(분)
+            <input type="number" id="cooldownMin" min="0" max="30" value="2" step="0.5" />
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="includeS10" />
+            S10 슈팅 포함
+          </label>
+        </div>
+      </details>
+    </footer>
+  </div>
+
+  <script src="../shared/store.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#0a0e14" />
+  <title>플라이휠 OS · 키오스크 체크인</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-mark">⚡</span>
+        <span class="logo-text">FLYWHEEL · 키오스크</span>
+      </div>
+      <div class="header-meta">
+        <span id="clock" class="clock">--:--</span>
+        <span class="badge">네이버 예약 전용</span>
+        <a href="../" class="badge" style="text-decoration:none">← 허브</a>
+      </div>
+    </header>
+
+    <!-- Main screens -->
+    <main class="main">
+      <!-- Screen: Phone entry -->
+      <section class="screen active" id="screen-phone" aria-label="전화번호 입력">
+        <h1 class="title">체크인</h1>
+        <p class="subtitle">예약하신 휴대폰 번호를 입력하세요</p>
+        <div class="phone-display" id="phone-display" aria-live="polite">010-</div>
+        <div class="keypad" id="keypad">
+          <button type="button" class="key" data-key="1">1</button>
+          <button type="button" class="key" data-key="2">2</button>
+          <button type="button" class="key" data-key="3">3</button>
+          <button type="button" class="key" data-key="4">4</button>
+          <button type="button" class="key" data-key="5">5</button>
+          <button type="button" class="key" data-key="6">6</button>
+          <button type="button" class="key" data-key="7">7</button>
+          <button type="button" class="key" data-key="8">8</button>
+          <button type="button" class="key" data-key="9">9</button>
+          <button type="button" class="key key-action" data-key="clear">전체삭제</button>
+          <button type="button" class="key" data-key="0">0</button>
+          <button type="button" class="key key-action" data-key="back">←</button>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-lookup" disabled>예약 확인</button>
+      </section>
+
+      <!-- Screen: Error -->
+      <section class="screen" id="screen-error" aria-label="오류">
+        <div class="icon-wrap error">✕</div>
+        <h1 class="title" id="error-title">예약 없음</h1>
+        <p class="subtitle" id="error-message">오늘 예약이 없습니다.</p>
+        <button type="button" class="btn btn-secondary" id="btn-error-back">다시 입력</button>
+      </section>
+
+      <!-- Screen: Confirm -->
+      <section class="screen" id="screen-confirm" aria-label="체크인 확인">
+        <h1 class="title">체크인 확인</h1>
+        <div class="card confirm-card">
+          <div class="row">
+            <span class="label">이름</span>
+            <span class="value" id="confirm-name">-</span>
+          </div>
+          <div class="row">
+            <span class="label">예약 시간</span>
+            <span class="value" id="confirm-slot">-</span>
+          </div>
+          <div class="row">
+            <span class="label">전화번호</span>
+            <span class="value" id="confirm-phone">-</span>
+          </div>
+          <label class="addon-toggle" id="addon-row">
+            <input type="checkbox" id="addon-shooting" />
+            <span class="addon-box"></span>
+            <span class="addon-text">촬영 애드온 추가 <small>(선택)</small></span>
+          </label>
+          <p class="addon-note" id="addon-already" hidden>촬영 애드온이 예약에 포함되어 있습니다.</p>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" id="btn-confirm-back">취소</button>
+          <button type="button" class="btn btn-primary" id="btn-confirm">체크인 · 문 열기</button>
+        </div>
+      </section>
+
+      <!-- Screen: Success -->
+      <section class="screen" id="screen-success" aria-label="체크인 완료">
+        <div class="door-anim" id="door-anim">
+          <div class="door-frame">
+            <div class="door-leaf left"></div>
+            <div class="door-leaf right"></div>
+          </div>
+          <p class="door-label">문 열림</p>
+        </div>
+        <h1 class="title success-title">체크인 완료!</h1>
+        <p class="subtitle" id="success-detail">환영합니다</p>
+        <p class="checkin-count" id="checkin-count">오늘 체크인 0명</p>
+        <button type="button" class="btn btn-secondary" id="btn-success-home" hidden>처음으로</button>
+      </section>
+    </main>
+
+    <!-- Admin / demo strip -->
+    <footer class="admin-strip">
+      <button type="button" class="admin-btn" id="btn-demo-list">데모 예약 목록 보기</button>
+      <button type="button" class="admin-btn danger" id="btn-reset">데모 데이터 초기화</button>
+      <span class="admin-hint">피크 10명 · 오프피크 8명 · 세션 ~45분</span>
+    </footer>
+
+    <!-- Demo list modal -->
+    <div class="modal" id="demo-modal" hidden>
+      <div class="modal-panel">
+        <div class="modal-head">
+          <h2>데모 예약 (오늘)</h2>
+          <button type="button" class="modal-close" id="btn-modal-close" aria-label="닫기">×</button>
+        </div>
+        <ul class="demo-list" id="demo-list"></ul>
+        <p class="modal-note">번호를 탭하면 키패드에 입력됩니다.</p>
+      </div>
+    </div>
+  </div>
+  <script src="../shared/store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
