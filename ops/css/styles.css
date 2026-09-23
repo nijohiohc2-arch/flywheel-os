@@ -653,3 +653,16 @@ body {
   .kpi-row { grid-template-columns: repeat(2, 1fr); }
   .live-clock { font-size: 1.35rem; }
 }
+
+
+/* Mobile + force-mobile page polish (ops) */
+@media (max-width: 700px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .main-grid { grid-template-columns: 1fr; }
+  .current-slot { grid-row: auto; }
+  .header { grid-template-columns: 1fr; }
+  .header-links { flex-wrap: wrap; justify-content: flex-start; }
+  .booking-list, .timeline { max-height: 280px; overflow-y: auto; }
+  .btn { min-height: 44px; }
+  .toast-stack { left: 0.65rem; right: 0.65rem; max-width: none; }
+}

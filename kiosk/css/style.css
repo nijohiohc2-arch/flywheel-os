@@ -609,3 +609,22 @@ html, body {
   border-style: dashed;
   opacity: 0.9;
 }
+
+
+/* Mobile + force-mobile page polish (kiosk) */
+@media (max-width: 700px) {
+  html, body { overflow: auto; height: auto; }
+  .app { height: auto; min-height: 100dvh; max-height: none; }
+  .key {
+    min-height: 56px;
+    aspect-ratio: 1.35 / 1;
+    font-size: 1.55rem;
+  }
+  .phone-display {
+    font-size: 1.75rem;
+    min-height: 64px;
+  }
+  .btn { min-height: 48px; }
+  .header { flex-wrap: wrap; gap: 0.4rem; }
+  .admin-hint { display: none; }
+}

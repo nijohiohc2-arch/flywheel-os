@@ -772,3 +772,47 @@ html, body {
   .crew-avatar-circle { width: 2.6rem; height: 2.6rem; font-size: 1rem; }
   .crew-marquee-inner { font-size: 1rem; white-space: normal; }
 }
+
+
+/* Mobile + force-mobile page polish (session) */
+@media (max-width: 700px) {
+  html, body { overflow: auto; height: auto; }
+  .app {
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    padding: 0.75rem 0.85rem 1rem;
+  }
+  .display {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+  #stationRing { width: min(100%, 240px); margin: 0 auto; display: block; }
+  .countdown { font-size: clamp(3.2rem, 18vw, 4.5rem); }
+  .crew-avatars {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.35rem;
+  }
+  .crew-avatar { width: 3.25rem; flex: 0 0 auto; }
+  .control-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  .control-btns .btn {
+    min-width: 0;
+    width: 100%;
+    min-height: 48px;
+  }
+  .controls { flex-direction: column; align-items: stretch; }
+  .settings { min-width: 0; width: 100%; }
+  .moment-banner { width: min(92vw, 360px); padding: 1rem 1.1rem; }
+  .moment-title { font-size: 1.45rem; }
+  .moment-overlay.kind-move .moment-title { font-size: 1.65rem; }
+  .topbar { flex-wrap: wrap; gap: 0.45rem; }
+  .phase-badge { font-size: 0.95rem; padding: 0.35rem 0.85rem; }
+  .cue-line, .crew-marquee-inner { text-align: center; }
+}

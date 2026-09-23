@@ -4,14 +4,16 @@
   position: fixed;
   top: 12px;
   right: 12px;
-  z-index: 10000;
+  z-index: 2147483000;
   display: inline-flex;
   background: #121820;
   border: 1px solid #2a3544;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  /* Stay on the real browser chrome — never clipped by phone column */
+  pointer-events: auto;
 }
 
 .fw-viewport-toggle button {
@@ -21,20 +23,30 @@
   color: #8b9aab;
   font: inherit;
   font-weight: 800;
-  font-size: 0.78rem;
-  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+  letter-spacing: -0.02em;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 0.9rem;
   cursor: pointer;
   white-space: nowrap;
-  letter-spacing: -0.02em;
+  transition: background 0.12s, color 0.12s;
 }
 
 .fw-viewport-toggle button:hover {
   color: #f0f4f8;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .fw-viewport-toggle button.active {
-  background: rgba(0, 229, 160, 0.2);
+  background: rgba(0, 229, 160, 0.22);
   color: #00e5a0;
+  box-shadow: inset 0 0 0 1px rgba(0, 229, 160, 0.35);
+}
+
+.fw-viewport-toggle button:focus-visible {
+  outline: 2px solid #00e5a0;
+  outline-offset: -2px;
 }
 
 /* Real-phone: hide toggle; keep natural mobile CSS */
@@ -48,60 +60,447 @@
 @media (min-width: 701px) {
   html.force-mobile {
     background: #05070a !important;
+    /* Toggle lives on <html>; do not transform html or toggle gets trapped */
   }
 
   html.force-mobile body {
     width: 390px !important;
     max-width: 390px !important;
-    margin: 20px auto !important;
-    min-height: calc(100vh - 40px) !important;
-    height: calc(100vh - 40px) !important;
-    border-radius: 32px;
+    margin: 16px auto !important;
+    max-height: 100dvh !important;
+    min-height: 0 !important;
+    height: calc(100dvh - 32px) !important;
+    border-radius: 28px;
     border: 3px solid #4a5568;
     box-shadow:
       0 0 0 2px #1a222d,
       inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-      0 0 0 12px rgba(0, 0, 0, 0.25),
-      0 28px 64px rgba(0, 0, 0, 0.55);
+      0 0 0 10px rgba(0, 0, 0, 0.22),
+      0 24px 56px rgba(0, 0, 0, 0.55);
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    position: relative;
-    /* keep page bg inside the phone column */
+    position: relative !important;
+    /* Contain position:fixed descendants (overlays/modals/toasts) inside phone column.
+       Toggle is appended to <html>, so it stays on the real browser window. */
+    transform: translateZ(0);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 
-  /* subtle notch / speaker */
+  /* Soft notch — non-interactive, does not clip controls */
   html.force-mobile body::before {
     content: "";
     position: absolute;
-    top: 10px;
+    top: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 72px;
-    height: 7px;
-    border-radius: 6px;
+    width: 64px;
+    height: 6px;
+    border-radius: 5px;
     background: #2a3544;
-    z-index: 9999;
+    z-index: 50;
     pointer-events: none;
   }
 
-
-  /* dim outside phone via html bg; body stays the column */
-  html.force-mobile .app {
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: calc(100% - 12px);
-    max-height: none !important;
-  }
-
-  html.force-mobile .wrap {
-    max-width: 100% !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-
-  /* keep toggle outside the phone chrome (fixed to viewport) */
+  /* Toggle stays fixed to the real browser window (top-right) */
   html.force-mobile .fw-viewport-toggle {
     top: 12px;
     right: 12px;
+  }
+
+  /* Generic containment helpers */
+  html.force-mobile .app,
+  html.force-mobile .wrap {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  html.force-mobile .wrap {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: 1.25rem !important;
+  }
+
+  html.force-mobile img,
+  html.force-mobile svg,
+  html.force-mobile video,
+  html.force-mobile canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* —— Hub (index.html) —— */
+  html.force-mobile .live-kpis,
+  html.force-mobile .flow,
+  html.force-mobile .panels {
+    grid-template-columns: 1fr !important;
+  }
+
+  html.force-mobile h1 {
+    font-size: 1.55rem !important;
+  }
+
+  html.force-mobile .tagline {
+    font-size: 0.95rem !important;
+  }
+
+  html.force-mobile .kpi-val {
+    font-size: 1.65rem !important;
+  }
+
+  html.force-mobile .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  html.force-mobile .actions .btn {
+    min-width: 0 !important;
+    width: 100%;
+    min-height: 48px;
+  }
+
+  html.force-mobile .crew-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  html.force-mobile .crew-mini {
+    grid-template-columns: 1fr !important;
+  }
+
+  html.force-mobile .panel .btn,
+  html.force-mobile .btn {
+    min-height: 48px;
+  }
+
+  /* —— Session (.app with .display / .topbar) —— */
+  html.force-mobile .app:has(.display),
+  html.force-mobile .app:has(> .topbar) {
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    padding: 0.75rem 0.85rem 1rem !important;
+    gap: 0.55rem !important;
+  }
+
+  /* Kiosk / Ops: allow scroll inside phone column without session padding */
+  html.force-mobile .app:has(> .main),
+  html.force-mobile .app:has(.kpi-row) {
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+  }
+
+  html.force-mobile .topbar {
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    padding-top: 0.65rem; /* clear soft notch */
+  }
+
+  html.force-mobile .brand-name {
+    font-size: 0.95rem !important;
+  }
+
+  html.force-mobile .phase-badge {
+    font-size: 0.95rem !important;
+    padding: 0.35rem 0.85rem !important;
+  }
+
+  html.force-mobile .top-meta {
+    font-size: 0.85rem !important;
+  }
+
+  html.force-mobile .display {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 0.75rem !important;
+  }
+
+  html.force-mobile .ring-panel {
+    padding: 0.65rem !important;
+  }
+
+  html.force-mobile #stationRing {
+    width: min(100%, 240px) !important;
+    max-width: 240px !important;
+    margin: 0 auto;
+    display: block;
+  }
+
+  html.force-mobile .ring-center-name {
+    font-size: 20px !important;
+  }
+
+  /* Countdown: vw is viewport-relative — pin to rem so it fits the 390 column */
+  html.force-mobile .countdown {
+    font-size: 3.75rem !important;
+    line-height: 1 !important;
+    letter-spacing: -0.04em;
+  }
+
+  html.force-mobile .crew-marquee-inner {
+    font-size: 0.95rem !important;
+    white-space: normal !important;
+    text-align: center;
+  }
+
+  html.force-mobile .station-name {
+    font-size: 1.15rem !important;
+  }
+
+  html.force-mobile .cue-line {
+    font-size: 0.95rem !important;
+    text-align: center;
+  }
+
+  html.force-mobile .crew-stage-title {
+    font-size: 1rem !important;
+  }
+
+  /* Crew stage: horizontal scroll chips, no wrap overflow */
+  html.force-mobile .crew-avatars {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 0.45rem !important;
+    padding-bottom: 0.35rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  html.force-mobile .crew-avatar {
+    width: 3.25rem !important;
+    flex: 0 0 auto !important;
+  }
+
+  html.force-mobile .crew-avatar-circle {
+    width: 2.4rem !important;
+    height: 2.4rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  html.force-mobile .crew-avatar-nick {
+    font-size: 0.65rem !important;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  html.force-mobile .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  html.force-mobile .control-btns {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  html.force-mobile .control-btns .btn {
+    min-width: 0 !important;
+    width: 100%;
+    min-height: 48px;
+    font-size: 0.95rem !important;
+    padding: 0.7rem 0.5rem !important;
+  }
+
+  html.force-mobile .settings {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  /* Moment overlays: contained by body transform; size to phone column */
+  html.force-mobile .moment-overlay {
+    border-radius: 25px;
+    overflow: hidden;
+  }
+
+  html.force-mobile .moment-banner {
+    width: calc(100% - 1.5rem) !important;
+    max-width: 360px !important;
+    padding: 1rem 1.1rem !important;
+  }
+
+  html.force-mobile .moment-title {
+    font-size: 1.45rem !important;
+  }
+
+  html.force-mobile .moment-overlay.kind-move .moment-title {
+    font-size: 1.65rem !important;
+  }
+
+  html.force-mobile .moment-sub {
+    font-size: 0.9rem !important;
+  }
+
+  /* —— Kiosk —— */
+  html.force-mobile .app:has(.keypad) .header,
+  html.force-mobile .app:has(> .main) .header {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 18px 14px 12px !important;
+  }
+
+  html.force-mobile .app:has(.keypad) .logo,
+  html.force-mobile .app:has(> .main) .logo {
+    font-size: 0.8rem !important;
+  }
+
+  html.force-mobile .app:has(.keypad) .header-meta,
+  html.force-mobile .app:has(> .main) .header-meta {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  html.force-mobile .app:has(.keypad) .main,
+  html.force-mobile .app:has(> .main) .main {
+    padding: 14px 14px 10px !important;
+  }
+
+  html.force-mobile .title {
+    font-size: 1.45rem !important;
+  }
+
+  html.force-mobile .subtitle {
+    font-size: 0.9rem !important;
+  }
+
+  html.force-mobile .phone-display {
+    font-size: 1.75rem !important;
+    min-height: 64px !important;
+    padding: 14px 10px !important;
+  }
+
+  html.force-mobile .keypad {
+    gap: 8px !important;
+  }
+
+  html.force-mobile .key {
+    aspect-ratio: 1.35 / 1;
+    min-height: 56px !important;
+    font-size: 1.55rem !important;
+    border-radius: 12px;
+  }
+
+  html.force-mobile .key-action {
+    font-size: 0.8rem !important;
+  }
+
+  html.force-mobile .btn {
+    min-height: 48px;
+    font-size: 1.05rem !important;
+    padding: 14px 16px !important;
+  }
+
+  html.force-mobile .btn-row {
+    grid-template-columns: 1fr 1.4fr !important;
+    gap: 8px;
+  }
+
+  html.force-mobile .admin-strip {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px !important;
+  }
+
+  html.force-mobile .admin-btn {
+    min-height: 40px;
+    font-size: 0.75rem;
+  }
+
+  html.force-mobile .admin-hint {
+    display: none;
+  }
+
+  html.force-mobile .modal-panel {
+    width: calc(100% - 1.5rem) !important;
+    max-width: 360px !important;
+    max-height: 85%;
+    overflow-y: auto;
+  }
+
+  /* —— Ops —— */
+  html.force-mobile .kpi-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  html.force-mobile .kpi-card {
+    padding: 0.7rem 0.75rem !important;
+  }
+
+  html.force-mobile .kpi-value {
+    font-size: 1.35rem !important;
+  }
+
+  html.force-mobile .kpi-label {
+    font-size: 0.68rem !important;
+  }
+
+  html.force-mobile .main-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  html.force-mobile .current-slot {
+    grid-row: auto !important;
+  }
+
+  html.force-mobile .app:has(.kpi-row) .header {
+    grid-template-columns: 1fr !important;
+    text-align: left;
+    gap: 0.5rem !important;
+    padding: 0.65rem 0.75rem !important;
+  }
+
+  html.force-mobile .app:has(.kpi-row) .header-center {
+    text-align: left !important;
+  }
+
+  html.force-mobile .app:has(.kpi-row) .header-links {
+    justify-content: flex-start !important;
+    flex-wrap: wrap;
+  }
+
+  html.force-mobile .live-clock {
+    font-size: 1.25rem !important;
+  }
+
+  html.force-mobile .brand-text h1 {
+    font-size: 1rem !important;
+  }
+
+  html.force-mobile .booking-list,
+  html.force-mobile .timeline {
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  html.force-mobile .btn-row {
+    flex-wrap: wrap;
+  }
+
+  html.force-mobile .demo-controls .btn,
+  html.force-mobile .btn {
+    min-height: 44px;
+  }
+
+  html.force-mobile .toast-stack {
+    left: 0.65rem;
+    right: 0.65rem;
+    bottom: 0.65rem;
+    max-width: none;
+    max-height: 38%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html.force-mobile .capacity-row,
+  html.force-mobile .capacity-meta {
+    flex-wrap: wrap;
   }
 }

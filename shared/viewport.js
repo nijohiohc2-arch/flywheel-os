@@ -3,6 +3,7 @@
  * Persists flywheel.viewport = "mobile" | "desktop"
  * On desktop widths: Mobile adds html.force-mobile (real layout ~390px).
  * On real phones (<700px): leave natural CSS; do not double-constrain.
+ * Toggle mounts on <html> so body transform containment does not trap it.
  */
 (function () {
   "use strict";
@@ -34,8 +35,14 @@
     document.documentElement.classList.toggle("force-mobile", useMobile);
     var desk = document.getElementById("fwModeDesktop");
     var mob = document.getElementById("fwModeMobile");
-    if (desk) desk.classList.toggle("active", mode === "desktop");
-    if (mob) mob.classList.toggle("active", mode === "mobile");
+    if (desk) {
+      desk.classList.toggle("active", mode === "desktop");
+      desk.setAttribute("aria-pressed", mode === "desktop" ? "true" : "false");
+    }
+    if (mob) {
+      mob.classList.toggle("active", mode === "mobile");
+      mob.setAttribute("aria-pressed", mode === "mobile" ? "true" : "false");
+    }
   }
 
   function ensureToggle() {
@@ -46,9 +53,10 @@
     el.setAttribute("role", "group");
     el.setAttribute("aria-label", "화면 보기");
     el.innerHTML =
-      '<button type="button" id="fwModeDesktop">데스크톱</button>' +
-      '<button type="button" id="fwModeMobile">모바일</button>';
-    document.body.appendChild(el);
+      '<button type="button" id="fwModeDesktop" aria-pressed="false">데스크톱</button>' +
+      '<button type="button" id="fwModeMobile" aria-pressed="false">모바일</button>';
+    /* Mount on <html> so body { transform } does not contain the toggle */
+    document.documentElement.appendChild(el);
     document.getElementById("fwModeDesktop").addEventListener("click", function () {
       writePref("desktop");
       apply("desktop");
@@ -70,7 +78,6 @@
     boot();
   }
 
-  // If user resizes across the 700px boundary, re-apply (drop double-constrain on phones)
   if (typeof MQ.addEventListener === "function") {
     MQ.addEventListener("change", function () {
       apply(readPref());
